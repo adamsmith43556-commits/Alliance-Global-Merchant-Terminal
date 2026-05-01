@@ -1,41 +1,114 @@
-// --- NOTIFICATION CONFIGURATION ---
-const nigerianNames = ["Chinedu", "Abubakar", "Olumide", "Ezenwa", "Tunde", "Blessing", "Aisha", "Uche", "Temitope", "Ibrahim", "Ngozi", "Favour", "Okon", "Segun", "Musa"];
-const payoutAmounts = ["₦157,400", "₦142,000", "₦210,500", "₦98,700", "₦165,000", "₦120,000"];
+/**
+ * AGMT PREMIUM NOTIFICATION ENGINE
+ * Designed for maximum FOMO and Trust
+ */
 
-// Create the HTML structure for the notification via JavaScript
-const toastHtml = `
-<div id="payout-toast" style="position: fixed; bottom: -120px; left: 20px; right: 20px; background: #ffffff; color: #0f172a; padding: 15px 20px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 15px; z-index: 99999; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #e2e8f0; max-width: 350px; margin: 0 auto;">
-    <div style="background: #10b981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">✅</div>
-    <div style="flex: 1;">
-        <p id="toast-user" style="font-size: 13px; font-weight: 800; margin: 0; color: #0f172a;">User @*******</p>
-        <p id="toast-desc" style="font-size: 11px; color: #64748b; margin: 0;">Just withdrew ₦145,500</p>
+const nigerianNames = [
+    "Abubakar M.", "Chinedu O.", "Olumide W.", "Ezenwa U.", "Tunde A.", 
+    "Blessing E.", "Aisha K.", "Uche J.", "Temitope B.", "Ibrahim S.", 
+    "Ngozi F.", "Favour P.", "Okon E.", "Segun D.", "Musa H.", "Damilola O."
+];
+
+const bankIcons = ["💳", "📱", "🌴", "🏦"];
+const withdrawalAmounts = ["₦145,000", "₦210,500", "₦88,200", "₦350,000", "₦125,000", "₦420,000"];
+
+// Create the notification container
+const style = document.createElement('style');
+style.innerHTML = `
+    .premium-toast {
+        position: fixed;
+        top: -100px;
+        left: 20px;
+        right: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        z-index: 999999;
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .toast-active { top: 25px; }
+    .toast-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .toast-content { flex: 1; }
+    .toast-user { font-size: 13px; font-weight: 800; color: #0f172a; margin: 0; }
+    .toast-msg { font-size: 11px; color: #64748b; margin: 2px 0 0; font-weight: 600; }
+    .toast-time { font-size: 9px; color: #94a3b8; margin-top: 4px; font-weight: 700; text-transform: uppercase; }
+`;
+document.head.appendChild(style);
+
+const toastMarkup = `
+    <div id="premiumToast" class="premium-toast">
+        <div id="pIcon" class="toast-icon">✅</div>
+        <div class="toast-content">
+            <p id="pUser" class="toast-user">User @*******</p>
+            <p id="pMsg" class="toast-msg">Successfully withdrew ₦145,500</p>
+            <p class="toast-time">Just Now • Verified</p>
+        </div>
     </div>
-</div>`;
+`;
+document.body.insertAdjacentHTML('beforeend', toastMarkup);
 
-// Inject the HTML into the body
-document.body.insertAdjacentHTML('beforeend', toastHtml);
+function launchToast() {
+    const toast = document.getElementById('premiumToast');
+    const user = document.getElementById('pUser');
+    const msg = document.getElementById('pMsg');
+    const icon = document.getElementById('pIcon');
 
-function showNotification() {
-    const toast = document.getElementById('payout-toast');
-    const userText = document.getElementById('toast-user');
-    const descText = document.getElementById('toast-desc');
+    const randomName = nigerianNames[Math.floor(Math.random() * nigerianNames.length)];
+    const randomType = Math.random(); // Decide notification type
 
-    const name = nigerianNames[Math.floor(Math.random() * nigerianNames.length)];
-    const amount = payoutAmounts[Math.floor(Math.random() * payoutAmounts.length)];
-    
-    userText.innerText = `${name} @****`;
-    descText.innerText = `Just withdrew ${amount} via OPay`;
+    if (randomType > 0.6) {
+        // UPGRADE NOTIFICATION (FOMO)
+        user.innerText = `${randomName} @Verified`;
+        msg.innerHTML = `Upgraded to <span style="color:#2563eb;">PREMIUM NODE</span> (Level 2)`;
+        icon.innerText = "💎";
+        icon.style.background = "rgba(37, 99, 235, 0.1)";
+        icon.style.color = "#2563eb";
+    } else if (randomType > 0.2) {
+        // WITHDRAWAL NOTIFICATION
+        const amt = withdrawalAmounts[Math.floor(Math.random() * withdrawalAmounts.length)];
+        user.innerText = `${randomName} @Payment`;
+        msg.innerText = `Successfully withdrew ${amt} to OPay`;
+        icon.innerText = "✅";
+        icon.style.background = "rgba(16, 185, 129, 0.1)";
+        icon.style.color = "#10b981";
+    } else {
+        // SERVER SYNC NOTIFICATION
+        user.innerText = "System Terminal";
+        msg.innerText = "Global Node Synchronization Complete.";
+        icon.innerText = "⚡";
+        icon.style.background = "rgba(245, 158, 11, 0.1)";
+        icon.style.color = "#f59e0b";
+    }
 
-    toast.style.bottom = "30px"; // Slide Up
+    // Show Toast
+    toast.classList.add('toast-active');
 
+    // Hide Toast after 5 seconds
     setTimeout(() => {
-        toast.style.bottom = "-120px"; // Slide Down
-    }, 4000);
+        toast.classList.remove('toast-active');
+    }, 5000);
 
-    const nextTime = Math.floor(Math.random() * (15000 - 9000 + 1)) + 9000;
-    setTimeout(showNotification, nextTime);
+    // Schedule next toast at random interval (between 12 and 25 seconds)
+    const nextLaunch = Math.floor(Math.random() * 13000) + 12000;
+    setTimeout(launchToast, nextLaunch);
 }
 
-// Start first notification
-setTimeout(showNotification, 4000);
-
+// Initial Delay before first toast
+setTimeout(launchToast, 4000);
