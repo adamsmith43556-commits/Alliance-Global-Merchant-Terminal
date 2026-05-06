@@ -1,1 +1,36 @@
 
+        <button class="btn-confirm" onclick="window.location.href='verify.html'">I HAVE MADE THE TRANSFER</button>
+
+        <p style="text-align: center; font-size: 10px; color: var(--text-dim); margin-top: 30px; line-height: 1.8; padding: 0 20px;">
+            Settlement monitored by the Centralized Clearing Network.<br>
+            If the timer expires, the node will reset and your funds will be held for 48 hours for manual audit.
+        </p>
+    </div>
+
+    <script>
+        function copyAcc(val) {
+            navigator.clipboard.writeText(val);
+            alert("Merchant Node Copied: " + val + "\nPlease complete the transfer in your bank app now.");
+        }
+
+        // TIMER LOGIC
+        let time = 900;
+        const timerText = document.getElementById('timer');
+        setInterval(() => {
+            let m = Math.floor(time / 60), s = time % 60;
+            timerText.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            if (time > 0) time--;
+            else { location.reload(); }
+        }, 1000);
+
+        // LIVE ACTIVITY
+        const logs = ["User ***004 received ₦906,750", "User ***221 verified Level 2", "Merchant ***105 payout successful"];
+        setInterval(() => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = logs[Math.floor(Math.random()*logs.length)];
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 4500);
+        }, 8500);
+    </script>
+</body>
+</html>
